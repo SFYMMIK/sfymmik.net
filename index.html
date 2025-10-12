@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <link rel="stylesheet" href="styles.css" />
+  <title>SfymmiK</title>
+</head>
+<body>
+  <div class="starfield" id="starfield"></div>
+
+  <main class="content">
+    <header class="gora wrap">
+      <img class="avatar" src="zdj.jpg" alt="Me" />
+      <nav class="linki">
+        <a class="guziki-gora" href="https://github.com/SFYMMIK">GitHub</a>
+        <a class="guziki-gora" onclick="openMiniGit()">My Repositories</a>
+        <a class="guziki-gora" href="https://www.youtube.com/@SFYMMIK">YouTube</a>
+        <a class="guziki-gora" onclick="alert('sfymmik')">Discord(user)</a>
+      </nav>
+    </header>
+
+    <hr id="linia" />
+
+    <h2>Well Hello There!, I'm a 15 year old programmer, and of course I'am a Unix-Like Operating Systems enjoyer • building & breaking things</h2>
+    <h2>I use Arch linux (feel the superiority)</h2>
+    <h2>Yes i did use BSD</h2>
+    <h2>Anyways this is my website idk what to do here, but</h2>
+    <h2>I am going to make it look as good as possible according to my likings</h2>
+  </main>
+
+  <script>
+  function openMiniGit() {
+    window.open(
+      "git.html",
+      "Repositories",
+      "width=900,height=650,scrollbars=yes,resizable=yes"
+    );
+  }
+  </script>
+  <script>
+    (function () {
+      const layer = document.getElementById('starfield');
+      function makeStars() {
+        layer.innerHTML = '';
+        const w = window.innerWidth;
+        const h = window.innerHeight;
+        const count = Math.max(80, Math.round((w * h) / 2500));
+        for (let i = 0; i < count; i++) {
+          const star = document.createElement('div');
+          const isSmall = Math.random() < 0.85;
+          const size = isSmall ? 1 : 1 + Math.random() * 2;
+          const alpha = 0.35 + Math.random() * 0.65;
+          star.className = 'star';
+          star.style.width = size + 'px';
+          star.style.height = size + 'px';
+          star.style.left = Math.random() * 100 + '%';
+          star.style.top = Math.random() * 100 + '%';
+          star.style.opacity = alpha;
+          star.style.setProperty('--alpha', alpha);
+          if (Math.random() < 0.4) {
+            const dur = (2 + Math.random() * 4).toFixed(2) + 's';
+            const delay = (Math.random() * 5).toFixed(2) + 's';
+            star.style.animation = `twinkle ${dur} ease-in-out ${delay} infinite`;
+          }
+          layer.appendChild(star);
+        }
+      }
+      makeStars();
+      let t;
+      window.addEventListener('resize', () => {
+        clearTimeout(t);
+        t = setTimeout(makeStars, 150);
+      });
+    })();
+  </script>
+</body>
+</html>

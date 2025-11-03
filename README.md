@@ -4,4 +4,5 @@
 https://sfymmik.net
 
 # Backup URL's
+https://sfymmik.github.io/sfymmik.net
 https://qiq.iks.mybluehost.me/

@@ -2,69 +2,55 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="author" content="Szymon Grajner (SfymmiK)">
+  <meta name="og:title" content="SfymmiK's Webpage">
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-  <link rel="stylesheet" href="styles.css" />
-  <title>SfymmiK</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <title>SfymmiK's Webpage</title>
+  <script>
+  window.addEventListener("load", () => {
+    document.body.classList.add("loaded");
+  });
+  </script>
 </head>
 <body>
-  <div class="starfield" id="starfield"></div>
-
   <main class="content">
-    <header class="gora wrap">
+    <header class="up wrap">
       <img class="avatar" src="zdj.jpg" alt="Me" />
       <nav class="linki">
-        <a class="guziki-gora" href="https://github.com/SFYMMIK">GitHub</a>
-        <a class="guziki-gora" href="https://www.youtube.com/@SFYMMIK">YouTube</a>
-        <a class="guziki-gora" onclick="alert('sfymmik')">Discord(user)</a>
-        <a class="guziki-gora" href="https://steamcommunity.com/profiles/76561199104390936/">Steam</a>
-        <a class="guziki-gora" href="https://namemc.com/profile/a7ef9121-81ed-4291-b4d6-cfc1105bcb5a">Minecraft (namemc)</a>
-        <a class="guziki-gora" href="https://stats.fm/sfymmik">Spotify (stats.fm)</a>
+        <a class="upper-buttons" href="https://github.com/SFYMMIK">GitHub</a>
+        <a class="upper-buttons" href="https://www.youtube.com/@SFYMMIK">YouTube</a>
+        <a class="upper-buttons" onclick="alert('sfymmik')">Discord(user)</a>
+        <a class="upper-buttons" href="https://steamcommunity.com/profiles/76561199104390936/">Steam</a>
+        <a class="upper-buttons" href="https://namemc.com/profile/a7ef9121-81ed-4291-b4d6-cfc1105bcb5a">Minecraft (namemc)</a>
+        <a class="upper-buttons" href="https://stats.fm/sfymmik">Spotify (stats.fm)</a>
       </nav>
     </header>
 
-    <hr id="linia" />
-
-    <h2>Well Hello There!, I'm a 15 year old programmer, and of course I'am a Unix-Like Operating Systems enjoyer • building & breaking things</h2>
-    <h2>I use Arch linux (feel the superiority)</h2>
-    <h2>Yes i did use BSD</h2>
+    <hr id="line" />
+    
+    <h2>Well Hello There!, I'm a 15 year old programmer, and of course I'am also a Unix-Like Operating Systems enjoyer • building & breaking things</h2>
+    <h2>I use Arch/Gentoo linux</h2>
     <h2>Anyways this is my website idk what to do here, but</h2>
     <h2>I am going to make it look as good as possible according to my likings</h2>
+    <hr id="line"/>
+    <h1>Friends / people i know</h1>
+    <a  class="badges" href="https://maydo.uk"><img src="maydo.png" alt="Maydo.uk" width="88" height="31"></a>
   </main>
-  <script>
-    (function () {
-      const layer = document.getElementById('starfield');
-      function makeStars() {
-        layer.innerHTML = '';
-        const w = window.innerWidth;
-        const h = window.innerHeight;
-        const count = Math.max(80, Math.round((w * h) / 2500));
-        for (let i = 0; i < count; i++) {
-          const star = document.createElement('div');
-          const isSmall = Math.random() < 0.85;
-          const size = isSmall ? 1 : 1 + Math.random() * 2;
-          const alpha = 0.35 + Math.random() * 0.65;
-          star.className = 'star';
-          star.style.width = size + 'px';
-          star.style.height = size + 'px';
-          star.style.left = Math.random() * 100 + '%';
-          star.style.top = Math.random() * 100 + '%';
-          star.style.opacity = alpha;
-          star.style.setProperty('--alpha', alpha);
-          if (Math.random() < 0.4) {
-            const dur = (2 + Math.random() * 4).toFixed(2) + 's';
-            const delay = (Math.random() * 5).toFixed(2) + 's';
-            star.style.animation = `twinkle ${dur} ease-in-out ${delay} infinite`;
-          }
-          layer.appendChild(star);
-        }
-      }
-      makeStars();
-      let t;
-      window.addEventListener('resize', () => {
-        clearTimeout(t);
-        t = setTimeout(makeStars, 150);
-      });
-    })();
-  </script>
+  <footer>
+    <hr id=line-footer />
+    <p class="footer-text">Made By Szymon Grajner (SfymmiK) <a href="https://github.com/SFYMMIK/sfymmik.net"><img id="github-svg" src="github-svg.svg"></img></a></p>
+    <p class="footer-text">Licensed under the <a href="https://raw.githubusercontent.com/SFYMMIK/sfymmik.net/refs/heads/main/LICENSE">MIT License</a></p>
+    <hr style="border: none;"/>
+    <img src="linux.png" alt="Linux" width="auto" height="auto" /><img src="thinkpad.png" alt="IBM ThinkPad" width="auto" height="auto" />
+    <hr style="border: none;"/>
+  <div class="badges">
+    <a href="https://www.linux.org/pages/download/"><img src="madeon_linux.gif" alt="Arch Linux" width="88" height="31"></a>
+    <a href="https://archlinux.org"><img src="arch-badge.png" alt="Arch Linux" width="88" height="31"></a>
+    <a href="https://gentoo.org"><img src="gentoo-badge.png" alt="Gentoo" width="88" height="31"></a>
+    <a href="https://freebsd.org"><img src="freebsd-badge.png" alt="FreeBSD" width="88" height="31"></a>
+  </div>
+  </footer>
 </body>
 </html>

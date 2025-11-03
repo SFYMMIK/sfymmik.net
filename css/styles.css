@@ -1,0 +1,245 @@
+* {
+text-shadow: none !important;
+}
+
+/* ===== IBM BIOS-2y pixel font ===== */
+@font-face {
+  font-family: "IBMBIOS2y";
+  src: url("fonts/ibm_bios-2y.woff2") format("woff2"); /* use PxPlus/Px437 bitmap build */
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ===== Global defaults ===== */
+html,
+body {
+  font-family: "IBMBIOS2y", monospace;
+  color: #0ff;
+  background: linear-gradient(180deg, #000010 0%, #0a001a 67%, #1a002b 100%);
+  background-attachment: fixed;
+  position: relative;
+  height: 100%;
+  margin: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  min-height: 100vh;
+  letter-spacing: 0;
+  font-smooth: never;
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeSpeed;
+  font-kerning: none;
+  font-feature-settings: "liga" 0, "calt" 0, "kern" 0;
+  line-height: 1;
+  font-size: 16px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+body {
+  filter: blur(20px);
+  opacity: 0;
+  transition: filter 1.5s ease-out, opacity 1.5s ease-out;
+}
+
+/* when page has loaded */
+body.loaded {
+  filter: blur(0);
+  opacity: 1;
+}
+
+main {
+  flex: 1;
+}
+
+/* ===== Headings ===== */
+h1, h2, h3, h4, h5, h6 {
+  font-family: "IBMBIOS2y", monospace;
+  padding: 10px;
+  color: #fff;
+  font-weight: 400;
+  line-height: 1;
+  -webkit-font-smoothing: none;
+}
+
+/* ===== Github logo svg styles ===== */
+#github-svg {
+  max-height: 15px;
+  max-width: auto;
+}
+
+/* ===== badges ===== */
+.badges img{
+  image-rendering: auto;
+  image-rendering: crisp-edges;
+  image-rendering: pixelated;
+  image-rendering: -webkit-optimize-contrast;
+}
+.badges img:hover{
+  box-shadow: 0 0 0 1px #ff0080, 0 0 0 3px rgba(255,0,128,.25);
+}
+
+/* ===== Layout containers ===== */
+.up {
+  width: 100%;
+  margin: 0;
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.wrap {
+  width: 100%;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+/* ===== Avatar ===== */
+.avatar {
+  width: 175px;
+  height: 175px;
+  object-fit: cover;
+  border-radius: 50%;
+  box-shadow: 0 2px 10px rgba(0,0,0,.35);
+  opacity: 1;
+  animation: slideUpFade 0.4s ease-out forwards;
+}
+
+/* ===== Buttons / Links ===== */
+.linki {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+#line {
+border: none;
+height: 4px;
+background: linear-gradient(to right, #ff0080, #7928ca);
+margin: 12px auto 0;
+border-radius: 3px;
+}
+
+footer {
+  position: static;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  background: transparent;
+  padding: 20px 0 10px;
+  margin-top: 40px;
+}
+
+/* same look as #linia but on the bottom */
+#line-footer {
+  border: none;
+  height: 4px;
+  background: linear-gradient(to right, #ff0080, #7928ca);
+  margin: 0 auto 6px;
+  border-radius: 3px;
+  width: auto;
+}
+
+.footer-text {
+  font-family: "IBMBIOS2y", monospace;
+  font-size: 14px;
+  color: #888;
+  margin: 0;
+  -webkit-font-smoothing: none;
+}
+
+.upper-buttons {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: .6rem 1rem;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(to left, #ff0080, #7928ca);
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  box-shadow: 0 2px 0 rgba(255,255,255,.12) inset, 0 8px 18px rgba(0,0,0,.35);
+  transform: translateY(0);
+  transition: transform .15s ease, filter .15s ease, box-shadow .2s ease;
+  opacity: 0;
+  animation: slideUpFade 0.8s ease-out forwards;
+  -webkit-font-smoothing: none;
+  transition: color 0.25s ease-out, transform 0.15s ease;
+}
+
+.upper-buttons:hover,
+.upper-buttons:focus-visible {
+  color: #000;
+  transform: translateY(-2px);
+  filter: none;
+  transition: color 0.50s ease-out, transform 0.30s ease;
+}
+
+/* ===== Animations ===== */
+@keyframes slideUpFade {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.upper-buttons:nth-child(1) { animation-delay: 0.6s; }
+.upper-buttons:nth-child(2) { animation-delay: 0.8s; }
+.upper-buttons:nth-child(3) { animation-delay: 1s; }
+.upper-buttons:nth-child(4) { animation-delay: 1.2s; }
+.upper-buttons:nth-child(5) { animation-delay: 1.4s; }
+.upper-buttons:nth-child(6) { animation-delay: 1.6s; }
+
+/* ===== Responsive tweaks ===== */
+@media (max-width: 640px) {
+  .wrap {
+    grid-template-columns: 1fr;
+    row-gap: 12px;
+  }
+  .avatar {
+    justify-self: start;
+  }
+  .links {
+    grid-column: 1;
+    min-height: unset;
+    justify-content: center;
+  }
+}
+
+/* ===== disable all shadows globally for extra sharpness ===== */
+
+.avatar:hover {
+  animation: spinInfinite 4s linear 1s infinite; /* infinite spin after 2s delay */
+}
+
+/* keyframes for continuous rotation */
+@keyframes spinInfinite {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* smooth return to normal when hover ends */
+.avatar:not(:hover) {
+  animation: none;
+  transform: rotate(0deg);
+  transition: transform 1.2s ease-in-out; /* slower, smoother reset */
+}

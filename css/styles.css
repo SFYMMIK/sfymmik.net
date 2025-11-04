@@ -1,11 +1,18 @@
 * {
-text-shadow: none !important;
+    padding: 1px;
+    text-shadow: none !important;
 }
+
+/* i know you have come here for the code,
+ and well sure take it but, take it according
+ to my license's permissions, this whole website is made from scratch
+ by me and if you want to maybe help me polish it more
+ feel free to message me on Discord (sfymmik) :)  */
 
 /* ===== IBM BIOS-2y pixel font ===== */
 @font-face {
   font-family: "IBMBIOS2y";
-  src: url("fonts/ibm_bios-2y.woff2") format("woff2"); /* use PxPlus/Px437 bitmap build */
+  src: url("fonts/ibm_bios-2y.woff2") format("woff2");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -41,7 +48,7 @@ body {
 body {
   filter: blur(20px);
   opacity: 0;
-  transition: filter 1.5s ease-out, opacity 1.5s ease-out;
+  transition: filter 1s ease-out, opacity 1s ease-out;
 }
 
 /* when page has loaded */
@@ -62,6 +69,28 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 400;
   line-height: 1;
   -webkit-font-smoothing: none;
+}
+
+#fieldset-ppl {
+border: 2px solid transparent;           /* border thickness */
+border-radius: 10px;                      /* smooth corners */
+background:
+linear-gradient(#0b0416, #0b0416) padding-box,              /* inner fill */
+linear-gradient(to right, #ff0080, #7928ca) border-box;     /* border grad */
+}
+
+/* make the legend “cut” the top border cleanly */
+#fieldset-ppl > legend {
+padding: 0 .6rem;
+background: #0b0416;                      /* same as page/panel bg */
+border-radius: 10px;                        /* optional, smoother notch */
+}
+
+#fieldset-ppl-pos {
+  align-items: center;
+  text-align: center;
+  display: flex;
+  justify-content: center;
 }
 
 /* ===== Github logo svg styles ===== */
@@ -140,7 +169,7 @@ footer {
   margin-top: 40px;
 }
 
-/* same look as #linia but on the bottom */
+/* same look as #line but on the bottom */
 #line-footer {
   border: none;
   height: 4px;
@@ -220,8 +249,6 @@ footer {
     justify-content: center;
   }
 }
-
-/* ===== disable all shadows globally for extra sharpness ===== */
 
 .avatar:hover {
   animation: spinInfinite 4s linear 1s infinite; /* infinite spin after 2s delay */

@@ -92,22 +92,32 @@ h1, h2, h3, h4, h5, h6 {
 
 /* ===== Fieldset Gradient Borders ===== */
 #fieldset-ppl {
-  border: 2px solid transparent;
-  border-radius: 10px;
-  background:
-    linear-gradient(#0b0416, #0b0416) padding-box,
-    linear-gradient(to right, #ff0080, #7928ca) border-box;
+border: 2px solid transparent;
+border-radius: 10px;
+background:
+linear-gradient(#0b0416, #0b0416) padding-box,
+linear-gradient(to right, #ff0080, #7928ca) border-box;
 }
 #fieldset-ppl > legend {
-  padding: 0 .6rem;
-  background: #0b0416;
-  border-radius: 10px;
+padding: 0 .6rem;
+background: #0b0416;
+border-radius: 10px;
 }
 #fieldset-ppl-pos {
-  align-items: center;
-  text-align: center;
-  display: flex;
-  justify-content: center;
+align-items: center;
+text-align: center;
+display: flex;
+justify-content: center;
+}
+
+h2, li {
+  a:link {
+    color: cornflowerblue;
+  }
+
+  a:visited {
+    color: cadetblue;
+  }
 }
 
 /* ===== Github logo svg ===== */
@@ -163,11 +173,11 @@ h1, h2, h3, h4, h5, h6 {
 .linki { display: flex; gap: 10px; flex-wrap: wrap; }
 
 #line {
-  border: none;
-  height: 4px;
-  background: linear-gradient(to right, #ff0080, #7928ca);
-  margin: 12px auto 0;
-  border-radius: 3px;
+border: none;
+height: 4px;
+background: linear-gradient(to right, #ff0080, #7928ca);
+margin: 12px auto 0;
+border-radius: 3px;
 }
 
 footer {
@@ -182,12 +192,12 @@ footer {
 }
 
 #line-footer {
-  border: none;
-  height: 4px;
-  background: linear-gradient(to right, #ff0080, #7928ca);
-  margin: 0 auto 6px;
-  border-radius: 3px;
-  width: auto;
+border: none;
+height: 4px;
+background: linear-gradient(to right, #ff0080, #7928ca);
+margin: 0 auto 6px;
+border-radius: 3px;
+width: auto;
 }
 
 .footer-text {

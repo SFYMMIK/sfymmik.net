@@ -1,16 +1,16 @@
 /* ===== Global reset ===== */
+html { box-sizing: border-box; }
+*, *::before, *::after { box-sizing: inherit; }
+
 * {
-  padding: 1px;
+  padding: 0;                     /* was 1px – caused side gaps */
   text-shadow: none !important;
-}
-*, *::before, *::after {
-  box-sizing: inherit;
 }
 
 /* ===== IBM BIOS-2y pixel font ===== */
 @font-face {
   font-family: "IBMBIOS2y";
-  src: url("fonts/ibm_bios-2y.woff2") format("woff2");
+  src: url("fonts/ibm_bios-2y.woff2") format("woff2"); /* keep as you have it */
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -24,7 +24,6 @@
 /* ===== Global defaults ===== */
 html,
 body {
-  box-sizing: border-box;
   font-family: "IBMBIOS2y", monospace;
   color: #0ff;
   background: linear-gradient(180deg, #000010 0%, #0a001a 67%, #1a002b 100%);
@@ -50,37 +49,29 @@ html {
   overflow-y: auto;
 }
 
-/* ===== Smooth fade-in on load + perfect 60vw center ===== */
+/* ===== Smooth fade-in (do NOT size the body) ===== */
 body {
   filter: blur(20px);
   opacity: 0;
-  transition: filter 1s ease-out, opacity 1s ease-out, margin 0.4s ease, width 0.4s ease;
-
-  /* 💫 keep 60vw centered until viewport < 60vw */
-  width: min(60vw, 100%);
-  margin-inline: auto;
+  transition: filter 1s ease-out, opacity 1s ease-out;
   padding-block: 15px 30px;
 }
+body.loaded { filter: blur(0); opacity: 1; }
 
-/* when page has loaded */
-body.loaded {
-  filter: blur(0);
-  opacity: 1;
-}
-
-/* ===== Main wrapper (just follows body width) ===== */
-.page {
-  width: 100%;
-  max-width: var(--content-width);
-  margin-inline: auto;
+/* ===== Centered column applied to your <body id="page"> ===== */
+#page {
+width: min(60vw, 100%);
+max-width: var(--content-width);
+margin-inline: auto;
 }
 
 /* ===== Main content area ===== */
-main {
-  flex: 1;
-  width: 100%;
-}
+main { flex: 1; width: 100%; }
 
+/* make media never overflow the column */
+img, video, canvas { max-width: 100%; height: auto; }
+
+/* ===== Hover container ===== */
 .container:hover {
   transform: scale(1.01);
   box-shadow: 0 0 1rem #0ff4;
@@ -88,7 +79,6 @@ main {
 
 /* ===== Headings ===== */
 h1, h2, h3, h4, h5, h6 {
-  font-family: "IBMBIOS2y", monospace;
   padding: 10px;
   color: #fff;
   font-weight: 400;
@@ -104,13 +94,11 @@ background:
 linear-gradient(#0b0416, #0b0416) padding-box,
 linear-gradient(to right, #ff0080, #7928ca) border-box;
 }
-
 #fieldset-ppl > legend {
 padding: 0 .6rem;
 background: #0b0416;
 border-radius: 10px;
 }
-
 #fieldset-ppl-pos {
 align-items: center;
 text-align: center;
@@ -119,10 +107,7 @@ justify-content: center;
 }
 
 /* ===== Github logo svg ===== */
-#github-svg {
-max-height: 15px;
-max-width: auto;
-}
+#github-svg { max-height: 15px; max-width: auto; }
 
 /* ===== badges ===== */
 .badges img {
@@ -147,7 +132,6 @@ max-width: auto;
   gap: 16px;
   flex-wrap: wrap;
 }
-
 .wrap {
   width: 100%;
   padding: 14px 18px;
@@ -169,16 +153,10 @@ max-width: auto;
   animation: slideUpFade 0.4s ease-out forwards;
   transition: transform 0.3s ease;
 }
-.avatar:hover {
-  transform: scale(1.05);
-}
+.avatar:hover { transform: scale(1.05); }
 
 /* ===== Buttons / Links ===== */
-.linki {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
+.linki { display: flex; gap: 10px; flex-wrap: wrap; }
 
 #line {
 border: none;
@@ -209,7 +187,6 @@ width: auto;
 }
 
 .footer-text {
-  font-family: "IBMBIOS2y", monospace;
   font-size: 14px;
   color: #888;
   margin: 0;
@@ -235,7 +212,6 @@ width: auto;
   animation: slideUpFade 0.8s ease-out forwards;
   -webkit-font-smoothing: none;
 }
-
 .upper-buttons:hover,
 .upper-buttons:focus-visible {
   color: #000;
@@ -245,16 +221,9 @@ width: auto;
 
 /* ===== Animations ===== */
 @keyframes slideUpFade {
-  from {
-    opacity: 0;
-    transform: translateY(40px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(40px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
-
 .upper-buttons:nth-child(1) { animation-delay: 0.6s; }
 .upper-buttons:nth-child(2) { animation-delay: 0.8s; }
 .upper-buttons:nth-child(3) { animation-delay: 1s; }
@@ -264,16 +233,9 @@ width: auto;
 
 /* ===== Responsive tweaks ===== */
 @media (max-width: 640px) {
-  body {
-    width: 97%; /* fill almost full width on phones */
-  }
-  .wrap {
-    grid-template-columns: 1fr;
-    row-gap: 12px;
-  }
-  .avatar {
-    justify-self: start;
-  }
+  #page { width: 95%; }        /* was body:97% – keep column logic consistent */
+  .wrap { row-gap: 12px; }
+  .avatar { justify-self: start; }
   .links {
     grid-column: 1;
     min-height: unset;

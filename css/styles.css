@@ -58,11 +58,15 @@ body {
 }
 body.loaded { filter: blur(0); opacity: 1; }
 
-/* ===== Centered column applied to your <body id="page"> ===== */
-#page {
-width: min(60vw, 100%);
-max-width: var(--content-width);
-margin-inline: auto;
+/* ===== Centered column (works on both hosts) ===== */
+#page,
+main.content,
+body > main {
+  width: 100%;
+  max-width: var(--content-width);   /* clamp(320px, 60vw, 1000px) */
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
 }
 
 /* ===== Main content area ===== */
@@ -88,22 +92,22 @@ h1, h2, h3, h4, h5, h6 {
 
 /* ===== Fieldset Gradient Borders ===== */
 #fieldset-ppl {
-border: 2px solid transparent;
-border-radius: 10px;
-background:
-linear-gradient(#0b0416, #0b0416) padding-box,
-linear-gradient(to right, #ff0080, #7928ca) border-box;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  background:
+    linear-gradient(#0b0416, #0b0416) padding-box,
+    linear-gradient(to right, #ff0080, #7928ca) border-box;
 }
 #fieldset-ppl > legend {
-padding: 0 .6rem;
-background: #0b0416;
-border-radius: 10px;
+  padding: 0 .6rem;
+  background: #0b0416;
+  border-radius: 10px;
 }
 #fieldset-ppl-pos {
-align-items: center;
-text-align: center;
-display: flex;
-justify-content: center;
+  align-items: center;
+  text-align: center;
+  display: flex;
+  justify-content: center;
 }
 
 /* ===== Github logo svg ===== */
@@ -159,11 +163,11 @@ justify-content: center;
 .linki { display: flex; gap: 10px; flex-wrap: wrap; }
 
 #line {
-border: none;
-height: 4px;
-background: linear-gradient(to right, #ff0080, #7928ca);
-margin: 12px auto 0;
-border-radius: 3px;
+  border: none;
+  height: 4px;
+  background: linear-gradient(to right, #ff0080, #7928ca);
+  margin: 12px auto 0;
+  border-radius: 3px;
 }
 
 footer {
@@ -178,12 +182,12 @@ footer {
 }
 
 #line-footer {
-border: none;
-height: 4px;
-background: linear-gradient(to right, #ff0080, #7928ca);
-margin: 0 auto 6px;
-border-radius: 3px;
-width: auto;
+  border: none;
+  height: 4px;
+  background: linear-gradient(to right, #ff0080, #7928ca);
+  margin: 0 auto 6px;
+  border-radius: 3px;
+  width: auto;
 }
 
 .footer-text {
@@ -233,7 +237,7 @@ width: auto;
 
 /* ===== Responsive tweaks ===== */
 @media (max-width: 640px) {
-  #page { width: 95%; }        /* was body:97% – keep column logic consistent */
+  #page, main.content, body > main { max-width: 95%; }
   .wrap { row-gap: 12px; }
   .avatar { justify-self: start; }
   .links {

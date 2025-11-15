@@ -1,3 +1,10 @@
+      /*   i know you have come here for the code,
+           and well sure take it but, take it according
+           to my license's permissions, this whole website is made from scratch
+           by me and if you want to maybe help me polish it more
+           feel free to message me on Discord (sfymmik) :)
+                                                        */
+
 /* ===== Global reset ===== */
 html { box-sizing: border-box; }
 *, *::before, *::after { box-sizing: inherit; }
@@ -98,11 +105,13 @@ background:
 linear-gradient(#0b0416, #0b0416) padding-box,
 linear-gradient(to right, #ff0080, #7928ca) border-box;
 }
+
 #fieldset-ppl > legend {
 padding: 0 .6rem;
 background: #0b0416;
 border-radius: 10px;
 }
+
 #fieldset-ppl-pos {
 align-items: center;
 text-align: center;
@@ -238,12 +247,12 @@ width: auto;
   from { opacity: 0; transform: translateY(40px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-.upper-buttons:nth-child(1) { animation-delay: 0.6s; }
-.upper-buttons:nth-child(2) { animation-delay: 0.8s; }
-.upper-buttons:nth-child(3) { animation-delay: 1s; }
-.upper-buttons:nth-child(4) { animation-delay: 1.2s; }
-.upper-buttons:nth-child(5) { animation-delay: 1.4s; }
-.upper-buttons:nth-child(6) { animation-delay: 1.6s; }
+.upper-buttons:nth-child(1) { animation-delay: 1s; }
+.upper-buttons:nth-child(2) { animation-delay: 1.2s; }
+.upper-buttons:nth-child(3) { animation-delay: 1.4s; }
+.upper-buttons:nth-child(4) { animation-delay: 1.6s; }
+.upper-buttons:nth-child(5) { animation-delay: 1.8s; }
+.upper-buttons:nth-child(6) { animation-delay: 2s; }
 
 /* ===== Responsive tweaks ===== */
 @media (max-width: 640px) {

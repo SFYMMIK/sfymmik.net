@@ -253,6 +253,7 @@ width: auto;
 .upper-buttons:nth-child(4) { animation-delay: 1.6s; }
 .upper-buttons:nth-child(5) { animation-delay: 1.8s; }
 .upper-buttons:nth-child(6) { animation-delay: 2s; }
+.upper-buttons:nth-child(7) { animation-delay: 2.2s;}
 
 /* ===== Responsive tweaks ===== */
 @media (max-width: 640px) {

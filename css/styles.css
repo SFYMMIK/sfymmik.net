@@ -225,20 +225,19 @@ width: auto;
   padding: .6rem 1rem;
   border-radius: 10px;
   border: none;
-  background: linear-gradient(to left, #ff0080, #7928ca);
   color: #fff;
   text-decoration: none;
   font-weight: 600;
-  box-shadow: 0 2px 0 rgba(255,255,255,.12) inset, 0 8px 18px rgba(0,0,0,.35);
+  box-shadow: 0 2px 0 rgba(255,255,255,.12) inset, 0 8px 18px rgba(15, 240, 255,.35);
   transform: translateY(0);
-  transition: transform .2s ease, color .3s ease, box-shadow .3s ease;
+  transition: transform .6s ease, color .6s ease, box-shadow .6s ease, color .6s;
   opacity: 0;
   animation: slideUpFade 0.8s ease-out forwards;
   -webkit-font-smoothing: none;
 }
 .upper-buttons:hover,
 .upper-buttons:focus-visible {
-  color: #000;
+  color: #0ff;
   transform: translateY(-2px);
   box-shadow: 0 0 12px rgba(255, 0, 128, 0.4);
 }

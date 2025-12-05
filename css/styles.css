@@ -59,7 +59,7 @@ html {
 
 /* ===== Smooth fade-in (do NOT size the body) ===== */
 body {
-  filter: blur(20px);
+  filter: blur(100px);
   opacity: 0;
   transition: filter 1s ease-out, opacity 1s ease-out;
   padding-block: 15px 30px;

@@ -22,18 +22,29 @@
   </script>
 </head>
 
-      <!-- i know you have come here for the code,
-           and well sure take it but, take it according
-           to my license's permissions, this whole website is made from scratch
-           by me and if you want to maybe help me polish it more
-           feel free to message me on Discord (sfymmik) :)
-                                                        -->
-           
+<!-- i know you have come here for the code,
+     and well sure take it but, take it according
+     to my license's permissions, this whole website is made from scratch
+     by me and if you want to maybe help me polish it more
+     feel free to message me on Discord (sfymmik) :)
+                                                  -->
+
 <body id="page">
+
+  <!-- Snow overlay -->
+  <div id="snow-overlay"></div>
+
   <main class="content">
     <header class="up wrap">
-      <img class="avatar" src="pfp.jpg" max-width="256" max-height="256" loading="lazy" />
+
+      <!-- Avatar + Santa hat wrapper -->
+      <div class="avatar-wrap">
+        <img class="avatar" src="pfp.jpg" max-width="256" max-height="256" loading="lazy" />
+        <img class="santa-hat" src="santa-hat.png" alt="" aria-hidden="true">
+      </div>
+
       <h1 style="color: #7928ca;">SfymmiK</h1>
+
       <nav class="linki">
         <a class="upper-buttons" href="https://github.com/SFYMMIK">GitHub (Mirror)</a>
         <a class="upper-buttons" href="https://codeberg.org/SfymmiK">Codeberg</a>
@@ -44,51 +55,136 @@
         <a class="upper-buttons" href="https://stats.fm/sfymmik">Spotify (stats.fm)</a>
       </nav>
     </header>
+
     <hr id="line" />
+
     <h1>Basic Info:</h1>
     <h2>Pronouns: He/Him</h2>
     <h2><a href="https://en.wikipedia.org/wiki/Asexuality">Asexual</a></h2>
+
     <hr id="line" />
+
     <h2>I'm a 15 year old programmer, and of course I'am also a Unix-Like Operating Systems enjoyer • building &amp breaking things</h2>
     <h2>I mainly work on web development and low-level experiments, often sharing my projects for others to explore</h2>
-    <h2>I use Arch/MX Linux (couldn't imagine working anywhere else), and my projects reflect what i enjoy most — clean code, practical design, and experimentation</h2>
+    <h2>I use Arch/MX Linux (couldn't imagine working anywhere else)</h2>
+
     <h2>And I also play some games except just code, like:</h2>
     <ul>
-      <li><a href="https://store.steampowered.com/app/730/CounterStrike_2/">Counter-Strike 2</a> (Mainly 2v2's) <a href="https://csstats.gg/player/76561199104390936?vs=2v2">(Statistics)</a></li>
+      <li><a href="https://store.steampowered.com/app/730/CounterStrike_2/">Counter-Strike 2</a></li>
       <li><a href="https://www.minecraft.net/">Minecraft</a></li>
       <li><a href="https://store.steampowered.com/app/3164500/Schedule_I/">Schedule 1</a></li>
       <li><a href="https://osu.ppy.sh/">Osu (Lazer)</a></li>
     </ul>
+
     <h2>Some of my current work includes:</h2>
     <ul>
-      <li><a href="https://github.com/SFYMMIK/sfymmik.net">sfymmik.net</a> - (this website)</li>
-      <li><a href="https://github.com/SFYMMIK/web.sfymmik">web.sfymmik</a> - my old website</li>
-      <li><a href="https://github.com/SFYMMIK/Dotfiles">Dotfiles</a> - my ThinkPad T440p Hyprland Dotfiles</li>
-      <li><a href="https://github.com/SFYMMIK/sp3_code">sp3_code</a> - simple Python programs made at school (beginner level)</li>
+      <li><a href="https://github.com/SFYMMIK/sfymmik.net">sfymmik.net</a></li>
+      <li><a href="https://github.com/SFYMMIK/web.sfymmik">web.sfymmik</a></li>
+      <li><a href="https://github.com/SFYMMIK/Dotfiles">Dotfiles</a></li>
+      <li><a href="https://github.com/SFYMMIK/sp3_code">sp3_code</a></li>
     </ul>
+
     <br/>
+
     <div id="fieldset-ppl-pos">
       <fieldset id="fieldset-ppl" style="max-width: 400px;">
         <legend style="font-size: 30px;">Friends / people i know</legend>
-        <a  class="badges" href="https://maydo.uk"><img src="maydo.png" alt="Maydo.uk" width="88" height="31"></a>
+        <a class="badges" href="https://maydo.uk">
+          <img src="maydo.png" alt="Maydo.uk" width="88" height="31">
+        </a>
       </fieldset>
     </div>
   </main>
+
   <footer>
-    <hr id=line-footer />
+    <hr id="line-footer" />
     <div class="badges">
-    <a href="https://www.linux.org/pages/download/"><img src="madeon_linux.gif" alt="Linux" width="88" height="31"></a>
-    <a href="https://archlinux.org"><img src="arch-badge.png" alt="Arch Linux" width="88" height="31"></a>
-    <a href="https://gentoo.org"><img src="gentoo-badge.png" alt="Gentoo" width="88" height="31"></a>
-    <a href="https://freebsd.org"><img src="freebsd-badge.png" alt="FreeBSD" width="88" height="31"></a>
+      <a href="https://www.linux.org/pages/download/"><img src="madeon_linux.gif" alt="Linux" width="88" height="31"></a>
+      <a href="https://archlinux.org"><img src="arch-badge.png" alt="Arch Linux" width="88" height="31"></a>
+      <a href="https://gentoo.org"><img src="gentoo-badge.png" alt="Gentoo" width="88" height="31"></a>
+      <a href="https://freebsd.org"><img src="freebsd-badge.png" alt="FreeBSD" width="88" height="31"></a>
     </div>
+
     <br/>
-    <img src="linux.png" alt="Linux" width="auto" height="auto" /><img src="thinkpad.png" alt="IBM ThinkPad" width="auto" height="auto" />
+
+    <img src="linux.png" alt="Linux" />
+    <img src="thinkpad.png" alt="IBM ThinkPad" />
+
     <br/>
-    <p class="footer-text">Made By Szymon Grajner (SfymmiK) <a href="https://codeberg.org/SfymmiK/sfymmik.net"><img id="github-svg" src="github-svg.svg"></img></a></p>
+
+    <p class="footer-text">
+      Made By Szymon Grajner (SfymmiK)
+      <a href="https://codeberg.org/SfymmiK/sfymmik.net">
+        <img id="github-svg" src="github-svg.svg">
+      </a>
+    </p>
+
     <br/>
-    <p class="footer-text">Licensed under the <a href="https://codeberg.org/SfymmiK/sfymmik.net/raw/branch/main/LICENSE">MIT License</a></p>
+
+    <p class="footer-text">
+      Licensed under the
+      <a href="https://codeberg.org/SfymmiK/sfymmik.net/raw/branch/main/LICENSE">MIT License</a>
+    </p>
+
     <br/>
   </footer>
+
+  <!-- Christmas script (manual ON/OFF, persists) -->
+  <script>
+  (() => {
+    const LS_SNOW = "xmas_snow";
+    const LS_HAT  = "xmas_hat";
+
+    let snowEnabled = localStorage.getItem(LS_SNOW) !== "0";
+    let hatEnabled  = localStorage.getItem(LS_HAT)  !== "0";
+
+    const snow = document.getElementById("snow-overlay");
+    const hat  = document.querySelector(".santa-hat");
+
+    let timer = null;
+
+    function spawn() {
+      if (!snow || snow.children.length > 150) return;
+      const f = document.createElement("div");
+      f.className = "snowflake";
+      f.textContent = "❄";
+      f.style.left = Math.random() * innerWidth + "px";
+      f.style.fontSize = (Math.random() * 14 + 8) + "px";
+      f.style.setProperty("--drift", (Math.random() * 80 - 40) + "px");
+      f.style.animationDuration = (Math.random() * 6 + 6) + "s";
+      snow.appendChild(f);
+      setTimeout(() => f.remove(), 13000);
+    }
+
+    function apply() {
+      if (hat) hat.style.display = hatEnabled ? "block" : "none";
+      if (snowEnabled) {
+        snow.style.display = "block";
+        if (!timer) timer = setInterval(spawn, 180);
+      } else {
+        snow.style.display = "none";
+        snow.innerHTML = "";
+        clearInterval(timer);
+        timer = null;
+      }
+    }
+
+    document.addEventListener("keydown", e => {
+      if (e.ctrlKey && e.shiftKey && e.key === "S") {
+        snowEnabled = !snowEnabled;
+        localStorage.setItem(LS_SNOW, snowEnabled ? "1" : "0");
+        apply();
+      }
+      if (e.ctrlKey && e.shiftKey && e.key === "H") {
+        hatEnabled = !hatEnabled;
+        localStorage.setItem(LS_HAT, hatEnabled ? "1" : "0");
+        apply();
+      }
+    });
+
+    apply();
+  })();
+  </script>
+
 </body>
 </html>

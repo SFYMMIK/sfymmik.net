@@ -1,4 +1,4 @@
-# This repository is a BETA/BACKUP/SOURCE CODE of my website, while sometimes it will be the same as my existing site sometimes it might not be.
+# This repository is a SOURCE CODE of my website, while sometimes it will be the same as my existing site sometimes it might not be.
 
 # Main URL (Bluehost)
 - https://sfymmik.net

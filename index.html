@@ -19,6 +19,10 @@
   window.addEventListener("load", () => {
     document.body.classList.add("loaded");
   });
+
+  setTimeout(() => {
+    alert("🎉 Happy New Year! 🎉");
+  }, 1500);
   </script>
 </head>
 
@@ -30,17 +34,10 @@
                                                   -->
 
 <body id="page">
-
-  <!-- ❄️ Snow overlay -->
-  <div id="snow-overlay"></div>
-
   <main class="content">
     <header class="up wrap">
-
-      <!-- Avatar + Santa hat wrapper -->
       <div class="avatar-wrap">
         <img class="avatar" src="pfp.jpg" max-width="256" max-height="256" loading="lazy" />
-        <img class="santa-hat" src="santa-hat.png" alt="" aria-hidden="true">
       </div>
 
       <h1 style="color: #7928ca;">SfymmiK</h1>
@@ -132,63 +129,5 @@
 
     <br/>
   </footer>
-
-  <!-- Xmas script (manual ON/OFF, persists) -->
-  <script>
-  (() => {
-    const LS_SNOW = "xmas_snow";
-    const LS_HAT  = "xmas_hat";
-
-    let snowEnabled = localStorage.getItem(LS_SNOW) !== "0";
-    let hatEnabled  = localStorage.getItem(LS_HAT)  !== "0";
-
-    const snow = document.getElementById("snow-overlay");
-    const hat  = document.querySelector(".santa-hat");
-
-    let timer = null;
-
-    function spawn() {
-      if (!snow || snow.children.length > 150) return;
-      const f = document.createElement("div");
-      f.className = "snowflake";
-      f.textContent = "❄";
-      f.style.left = Math.random() * innerWidth + "px";
-      f.style.fontSize = (Math.random() * 14 + 8) + "px";
-      f.style.setProperty("--drift", (Math.random() * 80 - 40) + "px");
-      f.style.animationDuration = (Math.random() * 6 + 6) + "s";
-      snow.appendChild(f);
-      setTimeout(() => f.remove(), 13000);
-    }
-
-    function apply() {
-      if (hat) hat.style.display = hatEnabled ? "block" : "none";
-      if (snowEnabled) {
-        snow.style.display = "block";
-        if (!timer) timer = setInterval(spawn, 180);
-      } else {
-        snow.style.display = "none";
-        snow.innerHTML = "";
-        clearInterval(timer);
-        timer = null;
-      }
-    }
-
-    document.addEventListener("keydown", e => {
-      if (e.ctrlKey && e.shiftKey && e.key === "S") {
-        snowEnabled = !snowEnabled;
-        localStorage.setItem(LS_SNOW, snowEnabled ? "1" : "0");
-        apply();
-      }
-      if (e.ctrlKey && e.shiftKey && e.key === "H") {
-        hatEnabled = !hatEnabled;
-        localStorage.setItem(LS_HAT, hatEnabled ? "1" : "0");
-        apply();
-      }
-    });
-
-    apply();
-  })();
-  </script>
-
 </body>
 </html>

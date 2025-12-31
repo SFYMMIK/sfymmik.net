@@ -283,31 +283,6 @@ width: auto;
   height: 175px;
 }
 
-.santa-hat {
-  position: absolute;
-  top: -50px;
-  left: -32px;
-  min-width: 275px;
-  pointer-events: none;
-  transform: rotate(-18deg);
-  filter: drop-shadow(0 6px 10px rgba(0,0,0,.45));
-}
-
-#snow-overlay {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 99999;
-  overflow: hidden;
-}
-
-.snowflake {
-  position: absolute;
-  top: -20px;
-  color: white;
-  animation: snow linear forwards;
-}
-
 @keyframes snow {
   to { transform: translate3d(var(--drift), 110vh, 0); }
 }

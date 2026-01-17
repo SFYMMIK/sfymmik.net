@@ -1,45 +1,48 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pl">
 <head>
   <meta charset="UTF-8" />
   <meta name="author" content="Szymon Grajner (SfymmiK)">
-  <meta property="og:description" content="SfymmiK – 15 y/o programmer from Poland, into Unix-like OS, low-level experiments, and web dev.">
-  <meta name="keywords" content="sfymmik,SfymmiK,SFYMMIK,Sfymmik">
+  <meta property="og:description" content="SfymmiK – 15 letni programista z Polski, w systemy Unix-podobne, nisko-poziomowe(low-level) eksperymenty, oraz web dev.">
+  <meta name="keywords" content="sfymmik,SfymmiK,SFYMMIK,Sfymmik,Szymon Grajner,Grajner Szymon">
   <meta property="og:url" content="https://sfymmik.net">
-  <meta property="og:site_name" content="SfymmiK's Webpage'">
+  <meta property="og:site_name" content="Strona SfymmiK'a">
   <meta name="referrer" content="no-referrer">
-  <meta name="og:title" content="SfymmiK's Webpage">
+  <meta name="og:title" content="Strona SfymmiK'a">
   <meta name="title" content="SfymmiK's Webpage">
   <meta property="og:image" content="https://sfymmik.net/pfp.jpg">
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
   <link rel="stylesheet" href="css/styles.css" />
   <link rel="icon" type="image/x-icon" href="pfp.jpg">
   <title>SfymmiK's Webpage</title>
-  <script>
-  window.addEventListener("load", () => {
+    <script>
+    window.addEventListener("load", () => {
     document.body.classList.add("loaded");
-  });
+    });
 
-  (function () {
-  const lang = (navigator.language || "").toLowerCase();
-  const langs = (navigator.languages || []).map(l => (l || "").toLowerCase());
 
-  const isPL = lang.startsWith("pl") || langs.some(l => l.startsWith("pl"));
+    (function () {
+    const lang = (navigator.language || "").toLowerCase();
+    const langs = (navigator.languages || []).map(l => (l || "").toLowerCase());
 
-  if (isPL) {
-    // jeśli jesteśmy na EN i przeglądarka PL -> idź na PL
-    location.replace("index.pl.html");
-  }
-  })();
-  </script>
+    const isPL = lang.startsWith("pl") || langs.some(l => l.startsWith("pl"));
+
+    if (!isPL) {
+        // jeśli jesteśmy na PL i przeglądarka nie-PL -> wróć na EN
+        location.replace("index.html");
+    }
+    })();
+    </script>
+
+
 
 </head>
 
-<!-- i know you have come here for the code,
-     and well sure take it but, take it according
-     to my license's permissions, this whole website is made from scratch
-     by me and if you want to maybe help me polish it more
-     feel free to message me on Discord (sfymmik) :)
+<!-- wiem że przyszedłeś tutaj po kod,
+     no i spoko weż go sobie ale zgodnie z
+     uprawnieniami mojej licencji, cała ta strona jest zrobiona od początku
+     przeze mnie, jeżeli chcesz mi pomóc ją bardziej podrasować
+     to napisz mi na discordzie (sfymmik) :)
                                                   -->
 
 <body id="page">
@@ -52,10 +55,10 @@
       <h1 style="color: #7928ca;">SfymmiK</h1>
 
       <nav class="linki">
-        <a class="upper-buttons" href="https://github.com/SFYMMIK">GitHub (Mirror)</a>
+        <a class="upper-buttons" href="https://github.com/SFYMMIK">GitHub (Lustro dla Codeberg)</a>
         <a class="upper-buttons" href="https://codeberg.org/SfymmiK">Codeberg</a>
         <a class="upper-buttons" href="https://www.youtube.com/@SFYMMIK">YouTube</a>
-        <a class="upper-buttons" onclick="alert('sfymmik')">Discord(user)</a>
+        <a class="upper-buttons" onclick="alert('sfymmik')">Discord(nazwa)</a>
         <a class="upper-buttons" href="https://steamcommunity.com/id/JustSfymmiK/">Steam</a>
         <a class="upper-buttons" href="https://namemc.com/profile/a7ef9121-81ed-4291-b4d6-cfc1105bcb5a">Minecraft (namemc)</a>
         <a class="upper-buttons" href="https://stats.fm/sfymmik">Spotify (stats.fm)</a>
@@ -64,17 +67,17 @@
 
     <hr id="line" />
 
-    <h1>Basic Info:</h1>
-    <h2>Pronouns: He/Him</h2>
-    <h2><a href="https://en.wikipedia.org/wiki/Asexuality">Asexual</a></h2>
+    <h1>Podstawowe Info:</h1>
+    <h2>Zaimki: On/On</h2>
+    <h2><a href="https://pl.wikipedia.org/wiki/Aseksualno%C5%9B%C4%87">Aseksualny</a></h2>
 
     <hr id="line" />
 
-    <h2>I'm a 15 year old programmer, and of course I'am also a Unix-Like Operating Systems enjoyer • building &amp breaking things</h2>
-    <h2>I mainly work on web development and low-level experiments, often sharing my projects for others to explore</h2>
-    <h2>I use Arch/MX Linux (couldn't imagine working anywhere else)</h2>
+    <h2>Jestem 15 letnim programistą, jestem również entuzjastą systemów operacyjnych Unix-podobnych</h2>
+    <h2>Pracuję głownie w web developmencie oraz nisko-poziomowych(low-level) eksperymentach, często udostępniając moje projekty dla innych do poeksplorowania</h2>
+    <h2>Używam Arch/MX Linux (nie wyobrażam sobie pracować w żadnym innym systemie)</h2>
 
-    <h2>And I also play some games except just code, like:</h2>
+    <h2>Oraz gram też w różne gry oprócz tylko i wyłącznie programowania, naprzykład:</h2>
     <ul>
       <li><a href="https://store.steampowered.com/app/730/CounterStrike_2/">Counter-Strike 2</a></li>
       <li><a href="https://www.minecraft.net/">Minecraft</a></li>
@@ -82,7 +85,7 @@
       <li><a href="https://osu.ppy.sh/">Osu (Lazer)</a></li>
     </ul>
 
-    <h2>Some of my current work includes:</h2>
+    <h2>Niektórymi z moich projektów są:</h2>
     <ul>
       <li><a href="https://github.com/SFYMMIK/sfymmik.net">sfymmik.net</a></li>
       <li><a href="https://github.com/SFYMMIK/web.sfymmik">web.sfymmik</a></li>
@@ -94,7 +97,7 @@
 
     <div id="fieldset-ppl-pos">
       <fieldset id="fieldset-ppl" style="max-width: 400px;">
-        <legend style="font-size: 30px;">Friends / people i know</legend>
+        <legend style="font-size: 30px;">Przyjaciele / osoby które znam</legend>
         <a class="badges" href="https://maydo.uk">
           <img src="maydo.png" alt="Maydo.uk" width="88" height="31">
         </a>
@@ -123,7 +126,7 @@
     <br/>
 
     <p class="footer-text">
-      Made By Szymon Grajner (SfymmiK)
+      Strona zaprojektowana oraz zaprogramowana przez: Szymon Grajner (SfymmiK)
       <a href="https://codeberg.org/SfymmiK/sfymmik.net">
         <img id="github-svg" src="github-svg.svg">
       </a>
@@ -132,10 +135,9 @@
     <br/>
 
     <p class="footer-text">
-      Licensed under the
-      <a href="https://codeberg.org/SfymmiK/sfymmik.net/raw/branch/main/LICENSE">MIT License</a>
+      Zalicencjowana pod:
+      <a href="https://codeberg.org/SfymmiK/sfymmik.net/raw/branch/main/LICENSE">Licencja MIT</a>
     </p>
-
     <br/>
   </footer>
 </body>

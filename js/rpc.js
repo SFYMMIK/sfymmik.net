@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // Use your own proxy endpoint on the same domain (most reliable on Bluehost)
+  // Use my own proxy endpoint on the same domain (most reliable on Bluehost)
   const REST_URL = new URL("../rpc-data.php", document.baseURI).toString();
 
   // ---- Elements

@@ -1,6 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
   const USER_ID = "764834366161420299";
-  const API_URL = `https://api.lanyard.rest/v1/users/${USER_ID}`;
 
   // ---- Elementy
   const dot = document.getElementById("rpcDot");
@@ -79,20 +78,10 @@ document.addEventListener("DOMContentLoaded", () => {
     return `https://cdn.discordapp.com/app-assets/${activity.application_id}/${key}.png`;
   }
 
-  // ---- Pasek Spotify
+  // ---- Pasek Spotify (PRAWDZIWE timestampy)
   let spTimer = null;
   let spStart = 0;
   let spEnd = 0;
-
-  // Zapamiętujemy ostatni utwór, żeby wykryć zmianę i zresetować pasek do 0:00
-  let lastTrackId = null;
-
-  // WAŻNE: lokalna kotwica — na WWW ZAWSZE startuje od 0:00 po zmianie utworu
-  let localSpotify = { trackId: null, startLocal: 0, endLocal: 0, duration: 0 };
-
-  // Korekta czasu (pomaga na telefonach / u innych osób, gdy zegar jest rozjechany)
-  let timeOffsetMs = 0; // serverNow ~= Date.now() + timeOffsetMs
-  function nowMs() { return Date.now() + timeOffsetMs; }
 
   function fmtTime(ms) {
     ms = Math.max(0, ms | 0);
@@ -109,10 +98,11 @@ document.addEventListener("DOMContentLoaded", () => {
     if (spTimer) clearInterval(spTimer);
 
     const tick = () => {
+      const now = Date.now();
       const dur = spEnd - spStart;
       if (dur <= 0) return;
 
-      const cur = Math.max(0, nowMs() - spStart);
+      const cur = now - spStart;
       const pct = Math.min(100, Math.max(0, (cur / dur) * 100));
 
       spFill.style.width = pct + "%";
@@ -134,128 +124,113 @@ document.addEventListener("DOMContentLoaded", () => {
     spDur.textContent = "0:00";
   }
 
-  // Główna aktualizacja
-  async function update() {
-    try {
-      // Cache-bust (niektóre przeglądarki/CDN potrafią zwrócić stare dane)
-      const res = await fetch(`${API_URL}?_=${Date.now()}`, { cache: "no-store" });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  // Render danych z Lanyard (z WS INIT_STATE / PRESENCE_UPDATE)
+  function render(data) {
+    // profil
+    const user = data.discord_user;
+    nameEl.textContent = user?.global_name || user?.username || "—";
+    avatar.src = discordAvatarUrl(user);
 
-      // Korekta czasu z nagłówka Date (zmniejsza różnice na telefonach)
-      const dateHdr = res.headers.get("Date");
-      if (dateHdr) {
-        const serverNow = Date.parse(dateHdr);
-        if (Number.isFinite(serverNow)) {
-          timeOffsetMs = serverNow - Date.now();
-        }
-      }
+    // status
+    const st = data.discord_status || "offline";
+    dot.style.background = statusColor[st] || statusColor.offline;
+    statusText.textContent = statusLabel(st);
 
-      const json = await res.json();
-      const data = json.data;
-      if (!data) throw new Error("0 danych");
+    // spotify
+    if (data.spotify?.track_id) {
+      spTrack.textContent = data.spotify.song || "—";
+      spArtist.textContent = data.spotify.artist || "—";
 
-      const user = data.discord_user;
-      nameEl.textContent = user?.global_name || user?.username || "—";
-      avatar.src = discordAvatarUrl(user);
+      if (data.spotify.album_art_url) {
+        spCover.src = data.spotify.album_art_url;
+        spCover.hidden = false;
+      } else spCover.hidden = true;
 
-      // Status
-      const st = data.discord_status || "offline";
-      dot.style.background = statusColor[st] || statusColor.offline;
-      statusText.textContent = statusLabel(st);
+      const startMs = data.spotify.timestamps?.start;
+      const endMs = data.spotify.timestamps?.end;
 
-      // Spotify + Cover albumu + progress
-      if (data.spotify?.track_id) {
-        spTrack.textContent = data.spotify.song || "—";
-        spArtist.textContent = data.spotify.artist || "—";
-
-        if (data.spotify.album_art_url) {
-          spCover.src = data.spotify.album_art_url;
-          spCover.hidden = false;
-        } else {
-          spCover.hidden = true;
-        }
-
-        const trackId = data.spotify.track_id;
-        const startMs = data.spotify.timestamps?.start;
-        const endMs = data.spotify.timestamps?.end;
-
-        // Jeśli utwór się zmienił -> ZAWSZE startuj od 0:00 lokalnie (nie ufamy remote start)
-        const trackChanged = (trackId !== lastTrackId);
-        lastTrackId = trackId;
-
-        if (startMs && endMs) {
-          const dur = endMs - startMs;
-          const now = nowMs();
-
-          if (trackChanged || localSpotify.trackId !== trackId) {
-            localSpotify = {
-              trackId,
-              duration: dur,
-              startLocal: now,
-              endLocal: now + dur
-            };
-
-            // twardy reset UI od razu
-            spFill.style.width = "0%";
-            spCur.textContent = "0:00";
-            spDur.textContent = fmtTime(dur);
-          } else {
-            // trzymamy lokalną kotwicę; celowo nie skaczemy do remote timestamp
-          }
-
-          spBarWrap.hidden = false;
-          startSpotifyBar(localSpotify.startLocal, localSpotify.endLocal);
-        } else {
-          spBarWrap.hidden = true;
-          stopSpotifyBar();
-        }
+      if (startMs && endMs) {
+        spBarWrap.hidden = false;
+        startSpotifyBar(startMs, endMs);
       } else {
-        lastTrackId = null;
-        localSpotify = { trackId: null, startLocal: 0, endLocal: 0, duration: 0 };
-
-        spTrack.textContent = "Nie słucham żadnej muzyki w tej chwili";
-        spArtist.textContent = "—";
-        spCover.hidden = true;
-
         spBarWrap.hidden = true;
         stopSpotifyBar();
       }
-
-      // Gra + Szczegóły + Ikona
-      const game = pickGame(data.activities || []);
-      if (game) {
-        gameEl.textContent = game.name || "—";
-        detailsEl.textContent = [game.details, game.state].filter(Boolean).join(" • ") || "—";
-
-        const iconUrl = activityAssetUrl(game, "large") || activityAssetUrl(game, "small");
-        if (iconUrl) {
-          gameIcon.src = iconUrl;
-          gameIcon.hidden = false;
-        } else {
-          gameIcon.hidden = true;
-        }
-      } else {
-        gameEl.textContent = "Nie gram w żadną grę w tej chwili";
-        detailsEl.textContent = "—";
-        gameIcon.hidden = true;
-      }
-    } catch (e) {
-      console.error("[Lanyard widget] aktualizacja nie powiodła się:", e);
-      statusText.textContent = "Error";
-      dot.style.background = statusColor.offline;
-      detailsEl.textContent = "Nie można załadować Aktywności";
-
+    } else {
+      spTrack.textContent = "Nie słucham żadnej muzyki w tej chwili";
+      spArtist.textContent = "—";
+      spCover.hidden = true;
       spBarWrap.hidden = true;
       stopSpotifyBar();
     }
+
+    // gra
+    const game = pickGame(data.activities || []);
+    if (game) {
+      gameEl.textContent = game.name || "—";
+      detailsEl.textContent = [game.details, game.state].filter(Boolean).join(" • ") || "—";
+
+      const iconUrl = activityAssetUrl(game, "large") || activityAssetUrl(game, "small");
+      if (iconUrl) {
+        gameIcon.src = iconUrl;
+        gameIcon.hidden = false;
+      } else {
+        gameIcon.hidden = true;
+      }
+    } else {
+      gameEl.textContent = "Nie gram w żadną grę w tej chwili";
+      detailsEl.textContent = "—";
+      gameIcon.hidden = true;
+    }
   }
 
-  // Odśwież natychmiast, gdy użytkownik wróci na kartę (na telefonach timery są throttlowane)
-  document.addEventListener("visibilitychange", () => {
-    if (!document.hidden) update();
-  });
-  window.addEventListener("focus", () => update());
+  // ---- Lanyard WebSocket
+  let ws = null;
+  let hb = null;
 
-  update();
-  setInterval(update, 1000);
+  function connect() {
+    if (ws) ws.close();
+
+    ws = new WebSocket("wss://api.lanyard.rest/socket");
+
+    ws.addEventListener("message", (ev) => {
+      let msg;
+      try { msg = JSON.parse(ev.data); } catch { return; }
+
+      if (msg.op === 1) {
+        const interval = msg.d?.heartbeat_interval ?? 30000;
+
+        // subskrypcja
+        ws.send(JSON.stringify({ op: 2, d: { subscribe_to_id: USER_ID } }));
+
+        if (hb) clearInterval(hb);
+        hb = setInterval(() => {
+          if (ws && ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({ op: 3, d: {} }));
+          }
+        }, interval);
+        return;
+      }
+
+      if (msg.op === 0) {
+        const t = msg.t;
+        const d = msg.d;
+
+        if (t === "INIT_STATE") {
+          const state = d?.[USER_ID];
+          if (state) render(state);
+        } else if (t === "PRESENCE_UPDATE") {
+          if (d) render(d);
+        }
+      }
+    });
+
+    ws.addEventListener("close", () => {
+      if (hb) clearInterval(hb);
+      hb = null;
+      setTimeout(connect, 1500);
+    });
+  }
+
+  connect();
 });

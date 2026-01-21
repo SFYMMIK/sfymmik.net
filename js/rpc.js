@@ -1,6 +1,8 @@
 document.addEventListener("DOMContentLoaded", () => {
   const USER_ID = "764834366161420299";
-  const REST_URL = `https://api.lanyard.rest/v1/users/${USER_ID}`;
+
+  // Prefer your own domain endpoint (PHP proxy) -> avoids CORS/CSP/Bluehost weirdness
+  const REST_URL = `rpc-data.php`; // same folder as index.php
   const WS_URL = "wss://api.lanyard.rest/socket";
 
   // ---- Elements
@@ -14,22 +16,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const gameEl = document.getElementById("rpcGame");
   const detailsEl = document.getElementById("rpcDetails");
 
+  // Spotify text + cover ONLY (bar is handled by PHP + rpc-progress.js)
   const spCover = document.getElementById("spCover");
   const spTrack = document.getElementById("spTrack");
   const spArtist = document.getElementById("spArtist");
 
-  const spBarWrap = document.getElementById("spBarWrap");
-  const spFill = document.getElementById("spFill");
-  const spCur = document.getElementById("spCur");
-  const spDur = document.getElementById("spDur");
-
-  // ---- Sanity check (helps when IDs don’t match)
-  const required = {
-    dot, statusText, avatar, nameEl,
-    gameIcon, gameEl, detailsEl,
-    spCover, spTrack, spArtist,
-    spBarWrap, spFill, spCur, spDur
-  };
+  // ---- Sanity check (only require what this file actually controls)
+  const required = { dot, statusText, avatar, nameEl, gameIcon, gameEl, detailsEl, spCover, spTrack, spArtist };
   for (const [k, v] of Object.entries(required)) {
     if (!v) {
       console.error(`[Lanyard widget] Missing element for id="${k}". Check your HTML IDs.`);
@@ -69,51 +62,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return `https://cdn.discordapp.com/app-assets/${activity.application_id}/${key}.png`;
   }
 
-  // ---- Spotify progress bar
-  let spTimer = null;
-  let spStart = 0;
-  let spEnd = 0;
-
-  function fmtTime(ms) {
-    ms = Math.max(0, ms | 0);
-    const total = Math.floor(ms / 1000);
-    const m = Math.floor(total / 60);
-    const s = total % 60;
-    return `${m}:${String(s).padStart(2, "0")}`;
-  }
-
-  function startSpotifyBar(startMs, endMs) {
-    spStart = startMs;
-    spEnd = endMs;
-
-    if (spTimer) clearInterval(spTimer);
-
-    const tick = () => {
-      const now = Date.now();
-      const dur = spEnd - spStart;
-      if (dur <= 0) return;
-      const cur = now - spStart;
-      const pct = Math.min(100, Math.max(0, (cur / dur) * 100));
-      spFill.style.width = pct + "%";
-      spCur.textContent = fmtTime(cur);
-      spDur.textContent = fmtTime(dur);
-    };
-
-    tick();
-    spTimer = setInterval(tick, 250);
-  }
-
-  function stopSpotifyBar() {
-    if (spTimer) clearInterval(spTimer);
-    spTimer = null;
-    spStart = 0;
-    spEnd = 0;
-    spFill.style.width = "0%";
-    spCur.textContent = "0:00";
-    spDur.textContent = "0:00";
-  }
-
-  // ---- Render
+  // ---- Render (Discord + game + Spotify text/cover ONLY)
   function render(data, sourceLabel) {
     const user = data.discord_user;
     nameEl.textContent = user?.global_name || user?.username || "—";
@@ -123,24 +72,24 @@ document.addEventListener("DOMContentLoaded", () => {
     dot.style.background = statusColor[st] || statusColor.offline;
     statusText.textContent = `${statusLabel(st)}${sourceLabel ? ` • ${sourceLabel}` : ""}`;
 
+    // Spotify: ONLY text + cover. (Bar is handled by rpc-progress.js.)
     if (data.spotify?.track_id) {
       spTrack.textContent = data.spotify.song || "—";
       spArtist.textContent = data.spotify.artist || "—";
-      if (data.spotify.album_art_url) { spCover.src = data.spotify.album_art_url; spCover.hidden = false; }
-      else spCover.hidden = true;
 
-      const startMs = data.spotify.timestamps?.start;
-      const endMs = data.spotify.timestamps?.end;
-      if (startMs && endMs) { spBarWrap.hidden = false; startSpotifyBar(startMs, endMs); }
-      else { spBarWrap.hidden = true; stopSpotifyBar(); }
+      if (data.spotify.album_art_url) {
+        spCover.src = data.spotify.album_art_url;
+        spCover.hidden = false;
+      } else {
+        spCover.hidden = true;
+      }
     } else {
       spTrack.textContent = "Not listening to anything right now";
       spArtist.textContent = "—";
       spCover.hidden = true;
-      spBarWrap.hidden = true;
-      stopSpotifyBar();
     }
 
+    // Game
     const game = pickGame(data.activities || []);
     if (game) {
       gameEl.textContent = game.name || "—";
@@ -156,14 +105,13 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // =========================
-  // REST
+  // REST (YOUR DOMAIN PROXY)
   // =========================
   let restTimer = null;
+
   async function restOnce() {
     const res = await fetch(`${REST_URL}?_=${Date.now()}`, {
       cache: "no-store",
-      // sometimes hosting/proxies behave better with this:
-      mode: "cors",
       credentials: "omit",
     });
     if (!res.ok) throw new Error(`REST HTTP ${res.status}`);
@@ -191,7 +139,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // =========================
-  // WebSocket
+  // WebSocket (REALTIME)
   // =========================
   let ws = null;
   let hb = null;
@@ -216,9 +164,7 @@ document.addEventListener("DOMContentLoaded", () => {
         ws.send(JSON.stringify({ op: 2, d: { subscribe_to_id: USER_ID } }));
         if (hb) clearInterval(hb);
         hb = setInterval(() => {
-          if (ws && ws.readyState === WebSocket.OPEN) {
-            ws.send(JSON.stringify({ op: 3, d: {} }));
-          }
+          if (ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ op: 3, d: {} }));
         }, interval);
         return;
       }
@@ -234,7 +180,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     ws.addEventListener("open", () => {
-      stopREST(); // WS works => stop REST
+      stopREST(); // WS works => stop REST spam
       setDiag("Connected (WS)");
     });
 
@@ -242,15 +188,13 @@ document.addEventListener("DOMContentLoaded", () => {
       console.warn("[Lanyard widget] WS closed:", ev.code, ev.reason);
       if (hb) { clearInterval(hb); hb = null; }
       ws = null;
-      // keep alive via REST
-      startREST();
+      startREST();              // fallback to your proxy REST
       setTimeout(connectWS, 2000);
     });
 
     ws.addEventListener("error", (e) => {
       console.error("[Lanyard widget] WS error:", e);
-      // fallback to REST
-      startREST();
+      startREST(); // fallback
     });
 
     return true;
@@ -260,17 +204,10 @@ document.addEventListener("DOMContentLoaded", () => {
   // Start: REST immediately, then try WS
   // =========================
   startREST();
+  setTimeout(() => { connectWS(); }, 400);
 
-  // Try WS after a short delay (so even if WS blocked, REST already works)
-  setTimeout(() => {
-    connectWS();
-  }, 400);
-
-  // If user returns to tab and REST is active, refresh now
   document.addEventListener("visibilitychange", () => {
-    if (!document.hidden && restTimer) {
-      restOnce().catch(() => {});
-    }
+    if (!document.hidden && restTimer) restOnce().catch(() => {});
   });
   window.addEventListener("focus", () => {
     if (restTimer) restOnce().catch(() => {});

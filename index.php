@@ -1,55 +1,55 @@
 <!DOCTYPE html>
-<html lang="pl">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="author" content="Szymon Grajner (SfymmiK)">
-  <meta property="og:description" content="SfymmiK – 15 letni programista z Polski, w systemy Unix-podobne, nisko-poziomowe(low-level) eksperymenty, oraz web dev.">
-  <meta name="keywords" content="sfymmik,SfymmiK,SFYMMIK,Sfymmik,Szymon Grajner,Grajner Szymon">
+  <meta property="og:description" content="SfymmiK – 15 y/o programmer from Poland, into Unix-like OS, low-level experiments, and web dev.">
+  <meta name="keywords" content="sfymmik,SfymmiK,SFYMMIK,Sfymmik">
   <meta property="og:url" content="https://sfymmik.net">
-  <meta property="og:site_name" content="Strona SfymmiK'a">
+  <meta property="og:site_name" content="SfymmiK's Webpage'">
   <meta name="referrer" content="no-referrer">
-  <meta name="og:title" content="Strona SfymmiK'a">
+  <meta name="og:title" content="SfymmiK's Webpage">
   <meta name="title" content="SfymmiK's Webpage">
   <meta property="og:image" content="https://sfymmik.net/pfp.jpg">
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
   <link rel="stylesheet" href="css/styles.css" />
   <link rel="icon" type="image/x-icon" href="pfp.jpg">
   <title>SfymmiK's Webpage</title>
+
   <meta http-equiv="Content-Security-Policy"
   content="
-  default-src 'self';
-  script-src 'self' 'unsafe-inline';
-  style-src 'self' 'unsafe-inline';
-  img-src 'self' https: data:;
-  connect-src 'self' https://api.lanyard.rest wss://api.lanyard.rest;
+    default-src 'self';
+    script-src 'self' 'unsafe-inline';
+    style-src 'self' 'unsafe-inline';
+    img-src 'self' https: data:;
+    connect-src 'self';
   ">
 
-    <script>
-    window.addEventListener("load", () => {
+  <script>
+  window.addEventListener("load", () => {
     document.body.classList.add("loaded");
-    });
+  });
 
-
-    (function () {
+  (function () {
     const lang = (navigator.language || "").toLowerCase();
     const langs = (navigator.languages || []).map(l => (l || "").toLowerCase());
-
     const isPL = lang.startsWith("pl") || langs.some(l => l.startsWith("pl"));
 
-    if (!isPL) {
-        // jeśli jesteś na PL i przeglądarka nie-PL -> wróć na EN
-        location.replace("index.html");
+    if (isPL) {
+      // if your browser language is set to PL and you are here -> redirect to PL
+      location.replace("index-pl.php");
     }
-    })();
-    </script>
-    <script src="js/rpc-pl.js"></script>
+  })();
+  </script>
+
+  <script src="js/rpc.js" defer></script>
 </head>
 
-<!-- wiem że przyszedłeś tutaj po kod,
-     no i spoko weż go sobie ale zgodnie z
-     uprawnieniami mojej licencji, cała ta strona jest zrobiona od początku
-     przeze mnie, jeżeli chcesz mi pomóc ją bardziej podrasować
-     to napisz mi na discordzie (sfymmik) :)
+<!-- i know you have come here for the code,
+     and well sure take it but, take it according
+     to my license's permissions, this whole website is made from scratch
+     by me and if you want to maybe help me polish it more
+     feel free to message me on Discord (sfymmik) :)
                                                   -->
 
 <body id="page">
@@ -62,10 +62,10 @@
       <h1 style="color: #7928ca;">SfymmiK</h1>
 
       <nav class="linki">
-        <a class="upper-buttons" href="https://github.com/SFYMMIK">GitHub (Lustro dla Codeberg)</a>
+        <a class="upper-buttons" href="https://github.com/SFYMMIK">GitHub (Mirror)</a>
         <a class="upper-buttons" href="https://codeberg.org/SfymmiK">Codeberg</a>
         <a class="upper-buttons" href="https://www.youtube.com/@SFYMMIK">YouTube</a>
-        <a class="upper-buttons" onclick="alert('sfymmik')">Discord(nazwa)</a>
+        <a class="upper-buttons" onclick="alert('sfymmik')">Discord(user)</a>
         <a class="upper-buttons" href="https://steamcommunity.com/id/JustSfymmiK/">Steam</a>
         <a class="upper-buttons" href="https://namemc.com/profile/a7ef9121-81ed-4291-b4d6-cfc1105bcb5a">Minecraft (namemc)</a>
         <a class="upper-buttons" href="https://stats.fm/sfymmik">Spotify (stats.fm)</a>
@@ -74,28 +74,28 @@
 
     <hr id="line" />
 
-    <h1>Podstawowe Info:</h1>
-    <h2>Zaimki: On/On</h2>
-    <h2><a href="https://pl.wikipedia.org/wiki/Aseksualno%C5%9B%C4%87">Aseksualny</a></h2>
+    <h1>Basic Info:</h1>
+    <h2>Pronouns: He/Him</h2>
+    <h2><a href="https://en.wikipedia.org/wiki/Asexuality">Asexual</a></h2>
 
     <div class="rpc-card" id="rpc">
       <div class="rpc-top">
         <div class="rpc-profile">
           <img class="rpc-avatar" id="rpcAvatar" alt="Avatar">
           <div class="rpc-who">
-            <div class="rpc-title">(Discord) Aktywność</div> <!-- fajne aktywnosci discord btw -->
+            <div class="rpc-title">(Discord) Activity</div> <!-- nice discord activity -->
             <div class="rpc-name" id="rpcName">—</div>
           </div>
         </div>
 
         <div class="rpc-pill">
           <span class="rpc-dot" id="rpcDot"></span>
-          <span class="rpc-status-text" id="rpcStatusText">Łączenie…</span>
+          <span class="rpc-status-text" id="rpcStatusText">Connecting…</span>
         </div>
       </div>
 
       <div class="rpc-block">
-        <div class="rpc-label">Gra w</div>
+        <div class="rpc-label">Playing</div>
         <div class="rpc-line">
           <img class="rpc-icon" id="gameIcon" alt="" hidden>
           <div>
@@ -105,24 +105,18 @@
         </div>
       </div>
 
-        <div class="rpc-sep"></div>
+      <div class="rpc-sep"></div>
 
-        <div class="rpc-block spotify">
-          <div class="rpc-label">(Spotify) Słucha</div>
-            <div class="rpc-line">
-              <img class="rpc-cover" id="spCover" alt="" hidden>
-            <div>
+      <div class="rpc-block spotify">
+        <div class="rpc-label">(Spotify) Listening to</div>
+        <div class="rpc-line">
+          <img class="rpc-cover" id="spCover" alt="" hidden>
+          <div>
             <div class="rpc-value" id="spTrack">—</div>
             <div class="rpc-sub" id="spArtist">—</div>
-            <div class="sp-bar-wrap" id="spBarWrap" hidden>
-            <div class="sp-times">
-              <div id="spCur">0:00</div>
-              <div id="spDur">0:00</div>
-            </div>
-              <div class="sp-bar">
-                <div class="sp-bar-fill" id="spFill"></div>
-              </div>
-            </div>
+
+            <!-- Spotify BAR is server-side now (no duplicate HTML block here) -->
+            <?php @include __DIR__ . '/rpc.php'; ?>
           </div>
         </div>
       </div>
@@ -130,11 +124,11 @@
 
     <hr id="line" />
 
-    <h2>Jestem 15 letnim programistą, jestem również entuzjastą systemów operacyjnych Unix-podobnych</h2>
-    <h2>Pracuję głownie w web developmencie oraz nisko-poziomowych(low-level) eksperymentach, często udostępniając moje projekty dla innych do poeksplorowania</h2>
-    <h2>Używam Arch/MX Linux (nie wyobrażam sobie pracować w żadnym innym systemie)</h2>
+    <h2>I'm a 15 year old programmer, and of course I'am also a Unix-Like Operating Systems enjoyer • building &amp breaking things</h2>
+    <h2>I mainly work on web development and low-level experiments, often sharing my projects for others to explore</h2>
+    <h2>I use Arch/MX Linux (couldn't imagine working anywhere else)</h2>
 
-    <h2>Oraz gram też w różne gry oprócz tylko i wyłącznie programowania, naprzykład:</h2>
+    <h2>And I also play some games except just code, like:</h2>
     <ul>
       <li><a href="https://store.steampowered.com/app/730/CounterStrike_2/">Counter-Strike 2</a></li>
       <li><a href="https://www.minecraft.net/">Minecraft</a></li>
@@ -142,7 +136,7 @@
       <li><a href="https://osu.ppy.sh/">Osu (Lazer)</a></li>
     </ul>
 
-    <h2>Niektórymi z moich projektów są:</h2>
+    <h2>Some of my current work includes:</h2>
     <ul>
       <li><a href="https://github.com/SFYMMIK/sfymmik.net">sfymmik.net</a></li>
       <li><a href="https://github.com/SFYMMIK/web.sfymmik">web.sfymmik</a></li>
@@ -154,7 +148,7 @@
 
     <div id="fieldset-ppl-pos">
       <fieldset id="fieldset-ppl" style="max-width: 400px;">
-        <legend style="font-size: 30px;">Przyjaciele / osoby które znam</legend>
+        <legend style="font-size: 30px;">Friends / people i know</legend>
         <a class="badges" href="https://maydo.uk">
           <img src="maydo.png" alt="Maydo.uk" width="88" height="31">
         </a>
@@ -172,7 +166,7 @@
     </div>
     <br/>
 
-      <a href="https://ko-fi.com/sfymmik/tip"><img id="kofi" src="kofi.jpg" /></a>
+    <a href="https://ko-fi.com/sfymmik/tip"><img id="kofi" src="kofi.jpg" /></a>
 
     <br/>
     <br/>
@@ -183,7 +177,7 @@
     <br/>
 
     <p class="footer-text">
-      Strona zaprojektowana oraz zaprogramowana przez: Szymon Grajner (SfymmiK)
+      Made By Szymon Grajner (SfymmiK)
       <a href="https://codeberg.org/SfymmiK/sfymmik.net">
         <img id="github-svg" src="github-svg.svg">
       </a>
@@ -192,9 +186,10 @@
     <br/>
 
     <p class="footer-text">
-      Zalicencjowana pod:
-      <a href="https://codeberg.org/SfymmiK/sfymmik.net/raw/branch/main/LICENSE">Licencja MIT</a>
+      Licensed under the
+      <a href="https://codeberg.org/SfymmiK/sfymmik.net/raw/branch/main/LICENSE">MIT License</a>
     </p>
+
     <br/>
   </footer>
 </body>

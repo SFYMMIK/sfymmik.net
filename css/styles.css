@@ -448,7 +448,6 @@ width: auto;
 
 .sp-bar{
   height: 10px;
-  min-width: 125px;
   border-radius: 999px;
   background: rgba(255,255,255,.10);
   border: 1px solid rgba(255,255,255,.10);

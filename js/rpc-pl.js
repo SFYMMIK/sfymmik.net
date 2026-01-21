@@ -17,8 +17,17 @@ document.addEventListener("DOMContentLoaded", () => {
   const spTrack = document.getElementById("spTrack");
   const spArtist = document.getElementById("spArtist");
 
-  // ---- sprawdzenie poprawności (pomocne, gdy identyfikatory nie pasują)
-  const required = { dot, statusText, avatar, nameEl, gameIcon, gameEl, detailsEl, spCover, spTrack, spArtist };
+  // Pasek Spotify (tylko szerokość)
+  const spBarWrap = document.getElementById("spBarWrap");
+  const spFill = document.getElementById("spFill");
+
+  // ---- sprawdzenie poprawności
+  const required = {
+    dot, statusText, avatar, nameEl,
+    gameIcon, gameEl, detailsEl,
+    spCover, spTrack, spArtist,
+    spBarWrap, spFill
+  };
   for (const [k, v] of Object.entries(required)) {
     if (!v) {
       console.error(`[Lanyard widget] Brakujący element dla id="${k}". Sprawdź ID w HTML.`);
@@ -62,13 +71,52 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const key = which === "small" ? activity.assets.small_image : activity.assets.large_image;
     if (!key) return null;
-
     if (key.startsWith("mp:")) return null;
 
     return `https://cdn.discordapp.com/app-assets/${activity.application_id}/${key}.png`;
   }
 
-  // Główna aktualizacja
+  // =========================
+  // Pasek Spotify (tylko szerokość)
+  // =========================
+  let barInterval = null;
+  let spStart = 0;
+  let spEnd = 0;
+  let lastTrackId = null;
+
+  function stopBar(reset = true) {
+    if (barInterval) clearInterval(barInterval);
+    barInterval = null;
+    spStart = 0;
+    spEnd = 0;
+    if (reset) spFill.style.width = "0%";
+  }
+
+  function updateBarOnce() {
+    const dur = spEnd - spStart;
+    if (dur <= 0) {
+      spFill.style.width = "0%";
+      return;
+    }
+    const now = Date.now();
+    const pct = Math.min(100, Math.max(0, ((now - spStart) / dur) * 100));
+    spFill.style.width = pct + "%";
+  }
+
+  function startBar(startMs, endMs, forceReset) {
+    spStart = startMs;
+    spEnd = endMs;
+
+    if (forceReset) spFill.style.width = "0%";
+
+    if (barInterval) clearInterval(barInterval);
+    updateBarOnce();
+    barInterval = setInterval(updateBarOnce, 500);
+  }
+
+  // =========================
+  // Główna aktualizacja (REST)
+  // =========================
   async function update() {
     try {
       const res = await fetch(`${API_URL}?_=${Date.now()}`, { cache: "no-store" });
@@ -87,8 +135,10 @@ document.addEventListener("DOMContentLoaded", () => {
       dot.style.background = statusColor[st] || statusColor.offline;
       statusText.textContent = statusLabel(st);
 
-      // Spotify (BEZ timera/paska)
+      // Spotify: tekst + okładka + pasek (tylko szerokość)
       if (data.spotify?.track_id) {
+        const trackId = data.spotify.track_id;
+
         spTrack.textContent = data.spotify.song || "—";
         spArtist.textContent = data.spotify.artist || "—";
 
@@ -98,10 +148,30 @@ document.addEventListener("DOMContentLoaded", () => {
         } else {
           spCover.hidden = true;
         }
+
+        const startMs = data.spotify.timestamps?.start;
+        const endMs = data.spotify.timestamps?.end;
+
+        spBarWrap.hidden = false;
+
+        const changed = (trackId !== lastTrackId);
+        lastTrackId = trackId;
+
+        if (startMs && endMs) {
+          startBar(startMs, endMs, changed);
+        } else {
+          stopBar(true);
+          spFill.style.width = "0%";
+        }
       } else {
+        lastTrackId = null;
+
         spTrack.textContent = "Nie słucham żadnej muzyki w tej chwili";
         spArtist.textContent = "—";
         spCover.hidden = true;
+
+        spBarWrap.hidden = true;
+        stopBar(true);
       }
 
       // Gra + Szczegóły + Ikona
@@ -127,13 +197,15 @@ document.addEventListener("DOMContentLoaded", () => {
       statusText.textContent = "Error";
       dot.style.background = statusColor.offline;
       detailsEl.textContent = "Nie można załadować Aktywności";
+
+      spBarWrap.hidden = true;
+      stopBar(true);
     }
   }
 
   update();
   setInterval(update, 3000);
 
-  // Na telefonach timery są throttlowane, więc dociągamy dane po powrocie
   document.addEventListener("visibilitychange", () => {
     if (!document.hidden) update();
   });

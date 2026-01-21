@@ -17,8 +17,17 @@ document.addEventListener("DOMContentLoaded", () => {
   const spTrack = document.getElementById("spTrack");
   const spArtist = document.getElementById("spArtist");
 
+  // Spotify BAR (width-only)
+  const spBarWrap = document.getElementById("spBarWrap");
+  const spFill = document.getElementById("spFill");
+
   // ---- Sanity check
-  const required = { dot, statusText, avatar, nameEl, gameIcon, gameEl, detailsEl, spCover, spTrack, spArtist };
+  const required = {
+    dot, statusText, avatar, nameEl,
+    gameIcon, gameEl, detailsEl,
+    spCover, spTrack, spArtist,
+    spBarWrap, spFill
+  };
   for (const [k, v] of Object.entries(required)) {
     if (!v) {
       console.error(`[Lanyard widget] Missing element for id="${k}". Check your HTML IDs.`);
@@ -62,13 +71,53 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const key = which === "small" ? activity.assets.small_image : activity.assets.large_image;
     if (!key) return null;
-
     if (key.startsWith("mp:")) return null;
 
     return `https://cdn.discordapp.com/app-assets/${activity.application_id}/${key}.png`;
   }
 
-  // Main update
+  // =========================
+  // Spotify BAR logic (width only)
+  // =========================
+  let barInterval = null;
+  let spStart = 0;
+  let spEnd = 0;
+  let lastTrackId = null;
+
+  function stopBar(reset = true) {
+    if (barInterval) clearInterval(barInterval);
+    barInterval = null;
+    spStart = 0;
+    spEnd = 0;
+    if (reset) spFill.style.width = "0%";
+  }
+
+  function updateBarOnce() {
+    const dur = spEnd - spStart;
+    if (dur <= 0) {
+      spFill.style.width = "0%";
+      return;
+    }
+    const now = Date.now();
+    const pct = Math.min(100, Math.max(0, ((now - spStart) / dur) * 100));
+    spFill.style.width = pct + "%";
+  }
+
+  function startBar(startMs, endMs, forceReset) {
+    spStart = startMs;
+    spEnd = endMs;
+
+    if (forceReset) spFill.style.width = "0%";
+
+    if (barInterval) clearInterval(barInterval);
+    updateBarOnce();
+    // smoother than 1000ms, still light
+    barInterval = setInterval(updateBarOnce, 500);
+  }
+
+  // =========================
+  // Main update (REST)
+  // =========================
   async function update() {
     try {
       const res = await fetch(`${API_URL}?_=${Date.now()}`, { cache: "no-store" });
@@ -87,8 +136,10 @@ document.addEventListener("DOMContentLoaded", () => {
       dot.style.background = statusColor[st] || statusColor.offline;
       statusText.textContent = statusLabel(st);
 
-      // Spotify (NO timer/bar)
+      // Spotify (text + cover + BAR width-only)
       if (data.spotify?.track_id) {
+        const trackId = data.spotify.track_id;
+
         spTrack.textContent = data.spotify.song || "—";
         spArtist.textContent = data.spotify.artist || "—";
 
@@ -98,10 +149,32 @@ document.addEventListener("DOMContentLoaded", () => {
         } else {
           spCover.hidden = true;
         }
+
+        const startMs = data.spotify.timestamps?.start;
+        const endMs = data.spotify.timestamps?.end;
+
+        // show bar always if spotify present
+        spBarWrap.hidden = false;
+
+        const changed = (trackId !== lastTrackId);
+        lastTrackId = trackId;
+
+        if (startMs && endMs) {
+          startBar(startMs, endMs, changed);
+        } else {
+          // no timestamps => just show empty bar
+          stopBar(true);
+          spFill.style.width = "0%";
+        }
       } else {
+        lastTrackId = null;
+
         spTrack.textContent = "Not listening to anything right now";
         spArtist.textContent = "—";
         spCover.hidden = true;
+
+        spBarWrap.hidden = true;
+        stopBar(true);
       }
 
       // Game + Details + Icon
@@ -127,13 +200,16 @@ document.addEventListener("DOMContentLoaded", () => {
       statusText.textContent = "Error";
       dot.style.background = statusColor.offline;
       detailsEl.textContent = "Couldn’t load presence";
+
+      // don’t keep a stuck bar
+      spBarWrap.hidden = true;
+      stopBar(true);
     }
   }
 
   update();
   setInterval(update, 3000);
 
-  // Mobile throttling help
   document.addEventListener("visibilitychange", () => {
     if (!document.hidden) update();
   });

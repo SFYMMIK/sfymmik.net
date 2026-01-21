@@ -15,7 +15,6 @@
   <link rel="stylesheet" href="css/styles.css" />
   <link rel="icon" type="image/x-icon" href="pfp.jpg">
   <title>SfymmiK's Webpage</title>
-
   <meta http-equiv="Content-Security-Policy"
   content="
     default-src 'self';
@@ -24,7 +23,6 @@
     img-src 'self' https: data:;
     connect-src 'self' https://api.lanyard.rest;
   ">
-
   <script>
   window.addEventListener("load", () => {
     document.body.classList.add("loaded");
@@ -37,30 +35,19 @@
 
     if (!isPL) {
       // jeśli jesteś na PL i przeglądarka nie-PL -> wróć na EN
-      location.replace("index.php");
+      location.replace("index.html");
     }
   })();
   </script>
-
   <script src="js/rpc-pl.js" defer></script>
 </head>
-
-<!-- wiem że przyszedłeś tutaj po kod,
-     no i spoko weż go sobie ale ale zgodnie z
-     uprawnieniami mojej licencji, cała ta strona jest zrobiona od początku
-     przeze mnie, jeżeli chcesz mi pomóc ją bardziej podrasować
-     to napisz mi na discordzie (sfymmik) :)
-                                                  -->
-
 <body id="page">
   <main class="content">
     <header class="up wrap">
       <div class="avatar-wrap">
-        <img class="avatar" src="pfymmiK.jpg" max-width="256" max-height="256" loading="lazy" />
+        <img class="avatar" src="pfp.jpg" max-width="256" max-height="256" loading="lazy" />
       </div>
-
       <h1 style="color: #7928ca;">SfymmiK</h1>
-
       <nav class="linki">
         <a class="upper-buttons" href="https://github.com/SFYMMIK">GitHub (Lustro dla Codeberg)</a>
         <a class="upper-buttons" href="https://codeberg.org/SfymmiK">Codeberg</a>
@@ -71,9 +58,7 @@
         <a class="upper-buttons" href="https://stats.fm/sfymmik">Spotify (stats.fm)</a>
       </nav>
     </header>
-
     <hr id="line" />
-
     <h1>Podstawowe Info:</h1>
     <h2>Zaimki: On/On</h2>
     <h2><a href="https://pl.wikipedia.org/wiki/Aseksualno%C5%9B%C4%87">Aseksualny</a></h2>
@@ -83,7 +68,7 @@
         <div class="rpc-profile">
           <img class="rpc-avatar" id="rpcAvatar" alt="Avatar">
           <div class="rpc-who">
-            <div class="rpc-title">(Discord) Aktywność</div> <!-- fajne aktywnosci discord btw -->
+            <div class="rpc-title">(Discord) Aktywność</div>
             <div class="rpc-name" id="rpcName">—</div>
           </div>
         </div>
@@ -114,17 +99,22 @@
           <div>
             <div class="rpc-value" id="spTrack">—</div>
             <div class="rpc-sub" id="spArtist">—</div>
+
+            <!-- Pasek Spotify (tylko szerokość) -->
+            <div class="sp-bar-wrap" id="spBarWrap" hidden>
+              <div class="sp-bar">
+                <div class="sp-bar-fill" id="spFill"></div>
+              </div>
+            </div>
+
           </div>
         </div>
       </div>
     </div>
-
     <hr id="line" />
-
     <h2>Jestem 15 letnim programistą, jestem również entuzjastą systemów operacyjnych Unix-podobnych</h2>
     <h2>Pracuję głownie w web developmencie oraz nisko-poziomowych(low-level) eksperymentach, często udostępniając moje projekty dla innych do poeksplorowania</h2>
     <h2>Używam Arch/MX Linux (nie wyobrażam sobie pracować w żadnym innym systemie)</h2>
-
     <h2>Oraz gram też w różne gry oprócz tylko i wyłącznie programowania, naprzykład:</h2>
     <ul>
       <li><a href="https://store.steampowered.com/app/730/CounterStrike_2/">Counter-Strike 2</a></li>
@@ -132,7 +122,6 @@
       <li><a href="https://store.steampowered.com/app/3164500/Schedule_I/">Schedule 1</a></li>
       <li><a href="https://osu.ppy.sh/">Osu (Lazer)</a></li>
     </ul>
-
     <h2>Niektórymi z moich projektów są:</h2>
     <ul>
       <li><a href="https://github.com/SFYMMIK/sfymmik.net">sfymmik.net</a></li>
@@ -140,9 +129,7 @@
       <li><a href="https://github.com/SFYMMIK/Dotfiles">Dotfiles</a></li>
       <li><a href="https://github.com/SFYMMIK/sp3_code">sp3_code</a></li>
     </ul>
-
     <br/>
-
     <div id="fieldset-ppl-pos">
       <fieldset id="fieldset-ppl" style="max-width: 400px;">
         <legend style="font-size: 30px;">Przyjaciele / osoby które znam</legend>
@@ -152,7 +139,6 @@
       </fieldset>
     </div>
   </main>
-
   <footer>
     <hr id="line-footer" />
     <div class="badges">
@@ -162,26 +148,19 @@
       <a href="https://freebsd.org"><img src="freebsd-badge.png" alt="FreeBSD" width="88" height="31"></a>
     </div>
     <br/>
-
     <a href="https://ko-fi.com/sfymmik/tip"><img id="kofi" src="kofi.jpg" /></a>
-
     <br/>
     <br/>
-
     <img src="linux.png" alt="Linux" />
     <img src="thinkpad.png" alt="IBM ThinkPad" />
-
     <br/>
-
     <p class="footer-text">
       Strona zaprojektowana oraz zaprogramowana przez: Szymon Grajner (SfymmiK)
       <a href="https://codeberg.org/SfymmiK/sfymmik.net">
         <img id="github-svg" src="github-svg.svg">
       </a>
     </p>
-
     <br/>
-
     <p class="footer-text">
       Zalicencjowana pod:
       <a href="https://codeberg.org/SfymmiK/sfymmik.net/raw/branch/main/LICENSE">Licencja MIT</a>

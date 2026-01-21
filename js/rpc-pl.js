@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
   // Używamy proxy na Twojej domenie (najbardziej niezawodne na Bluehost)
-  const REST_URL = new URL("rpc-data.php", document.baseURI).toString();
+  const REST_URL = new URL("../rpc-data.php", document.baseURI).toString();
 
   // ---- Elementy
   const dot = document.getElementById("rpcDot");

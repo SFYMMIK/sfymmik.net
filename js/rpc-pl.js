@@ -87,8 +87,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // Zapamiętujemy ostatni utwór, żeby wykryć zmianę i zresetować pasek do 0:00
   let lastTrackId = null;
 
-  // Przez krótki czas po zmianie utworu pokazujemy 0:00, żeby nie skakało do 50s
-  let spZeroUntil = 0;
+  // WAŻNE: lokalna kotwica — na WWW ZAWSZE startuje od 0:00 po zmianie utworu
+  let localSpotify = { trackId: null, startLocal: 0, endLocal: 0, duration: 0 };
 
   // Korekta czasu (pomaga na telefonach / u innych osób, gdy zegar jest rozjechany)
   let timeOffsetMs = 0; // serverNow ~= Date.now() + timeOffsetMs
@@ -102,44 +102,22 @@ document.addEventListener("DOMContentLoaded", () => {
     return `${m}:${String(s).padStart(2, "0")}`;
   }
 
-  function startSpotifyBar(startMs, endMs, forceResetToZero = false) {
-    const now = nowMs();
-
-    // Jeśli utwór się zmienił, ale timestamp wygląda jakby "już leciało długo",
-    // to przytnij start do teraz (eliminuje skoki typu 0:50 po zmianie)
-    if (forceResetToZero && (now - startMs) > 5000) {
-      const dur = endMs - startMs;
-      startMs = now;
-      endMs = now + dur;
-    }
-
+  function startSpotifyBar(startMs, endMs) {
     spStart = startMs;
     spEnd = endMs;
 
     if (spTimer) clearInterval(spTimer);
 
-    const dur = spEnd - spStart;
-    spDur.textContent = fmtTime(dur);
-
-    // Wymuszony reset wizualny + chwila "0:00" (żeby user widział reset)
-    if (forceResetToZero) {
-      spZeroUntil = now + 1200; // 1.2s
-      spFill.style.width = "0%";
-      spCur.textContent = "0:00";
-    }
-
     const tick = () => {
-      const now2 = nowMs();
-      const dur2 = spEnd - spStart;
-      if (dur2 <= 0) return;
+      const dur = spEnd - spStart;
+      if (dur <= 0) return;
 
-      // Przez chwilę po zmianie utworu trzymaj 0:00 zamiast skoku
-      const cur = (now2 < spZeroUntil) ? 0 : (now2 - spStart);
+      const cur = Math.max(0, nowMs() - spStart);
+      const pct = Math.min(100, Math.max(0, (cur / dur) * 100));
 
-      const pct = Math.min(100, Math.max(0, (cur / dur2) * 100));
       spFill.style.width = pct + "%";
       spCur.textContent = fmtTime(cur);
-      spDur.textContent = fmtTime(dur2);
+      spDur.textContent = fmtTime(dur);
     };
 
     tick();
@@ -151,7 +129,6 @@ document.addEventListener("DOMContentLoaded", () => {
     spTimer = null;
     spStart = 0;
     spEnd = 0;
-    spZeroUntil = 0;
     spFill.style.width = "0%";
     spCur.textContent = "0:00";
     spDur.textContent = "0:00";
@@ -202,20 +179,39 @@ document.addEventListener("DOMContentLoaded", () => {
         const startMs = data.spotify.timestamps?.start;
         const endMs = data.spotify.timestamps?.end;
 
-        // Jeśli utwór się zmienił -> resetuj pasek do 0:00 (żeby nie "skakał" do 50s itp.)
+        // Jeśli utwór się zmienił -> ZAWSZE startuj od 0:00 lokalnie (nie ufamy remote start)
         const trackChanged = (trackId !== lastTrackId);
         lastTrackId = trackId;
 
         if (startMs && endMs) {
+          const dur = endMs - startMs;
+          const now = nowMs();
+
+          if (trackChanged || localSpotify.trackId !== trackId) {
+            localSpotify = {
+              trackId,
+              duration: dur,
+              startLocal: now,
+              endLocal: now + dur
+            };
+
+            // twardy reset UI od razu
+            spFill.style.width = "0%";
+            spCur.textContent = "0:00";
+            spDur.textContent = fmtTime(dur);
+          } else {
+            // trzymamy lokalną kotwicę; celowo nie skaczemy do remote timestamp
+          }
+
           spBarWrap.hidden = false;
-          startSpotifyBar(startMs, endMs, trackChanged);
+          startSpotifyBar(localSpotify.startLocal, localSpotify.endLocal);
         } else {
           spBarWrap.hidden = true;
           stopSpotifyBar();
         }
       } else {
         lastTrackId = null;
-        spZeroUntil = 0;
+        localSpotify = { trackId: null, startLocal: 0, endLocal: 0, duration: 0 };
 
         spTrack.textContent = "Nie słucham żadnej muzyki w tej chwili";
         spArtist.textContent = "—";

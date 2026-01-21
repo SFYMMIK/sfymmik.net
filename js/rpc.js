@@ -87,8 +87,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // Track-change detection so the bar resets to 0:00 immediately
   let lastTrackId = null;
 
-  // Keep 0:00 briefly after track change so it doesn't jump to 0:50 on some devices
-  let spZeroUntil = 0;
+  // IMPORTANT: local anchor so it ALWAYS starts at 0:00 on any device
+  let localSpotify = { trackId: null, startLocal: 0, endLocal: 0, duration: 0 };
 
   // Server/client time offset (helps if someone’s phone clock is off)
   let timeOffsetMs = 0; // serverNow ~= Date.now() + timeOffsetMs
@@ -102,43 +102,22 @@ document.addEventListener("DOMContentLoaded", () => {
     return `${m}:${String(s).padStart(2, "0")}`;
   }
 
-  function startSpotifyBar(startMs, endMs, forceResetToZero = false) {
-    const now = nowMs();
-
-    // If track changed but timestamps already look "old", clamp to now to avoid jumps (0:50 etc.)
-    if (forceResetToZero && (now - startMs) > 5000) {
-      const dur = endMs - startMs;
-      startMs = now;
-      endMs = now + dur;
-    }
-
+  function startSpotifyBar(startMs, endMs) {
     spStart = startMs;
     spEnd = endMs;
 
     if (spTimer) clearInterval(spTimer);
 
-    const dur = spEnd - spStart;
-    spDur.textContent = fmtTime(dur);
-
-    // Force visual reset + grace period (so 0:00 is actually visible)
-    if (forceResetToZero) {
-      spZeroUntil = now + 1200; // 1.2s grace period
-      spFill.style.width = "0%";
-      spCur.textContent = "0:00";
-    }
-
     const tick = () => {
-      const now2 = nowMs();
-      const dur2 = spEnd - spStart;
-      if (dur2 <= 0) return;
+      const dur = spEnd - spStart;
+      if (dur <= 0) return;
 
-      // During grace period keep 0:00 instead of jumping
-      const cur = (now2 < spZeroUntil) ? 0 : (now2 - spStart);
+      const cur = Math.max(0, nowMs() - spStart);
+      const pct = Math.min(100, Math.max(0, (cur / dur) * 100));
 
-      const pct = Math.min(100, Math.max(0, (cur / dur2) * 100));
       spFill.style.width = pct + "%";
       spCur.textContent = fmtTime(cur);
-      spDur.textContent = fmtTime(dur2);
+      spDur.textContent = fmtTime(dur);
     };
 
     tick();
@@ -150,7 +129,6 @@ document.addEventListener("DOMContentLoaded", () => {
     spTimer = null;
     spStart = 0;
     spEnd = 0;
-    spZeroUntil = 0;
     spFill.style.width = "0%";
     spCur.textContent = "0:00";
     spDur.textContent = "0:00";
@@ -201,20 +179,40 @@ document.addEventListener("DOMContentLoaded", () => {
         const startMs = data.spotify.timestamps?.start;
         const endMs = data.spotify.timestamps?.end;
 
-        // If track changed -> reset bar/timer to 0:00 and clamp if needed
+        // If track changed -> ALWAYS start from 0:00 locally (do NOT trust remote start time)
         const trackChanged = (trackId !== lastTrackId);
         lastTrackId = trackId;
 
         if (startMs && endMs) {
+          const dur = endMs - startMs;
+          const now = nowMs();
+
+          if (trackChanged || localSpotify.trackId !== trackId) {
+            localSpotify = {
+              trackId,
+              duration: dur,
+              startLocal: now,
+              endLocal: now + dur
+            };
+
+            // hard reset UI NOW
+            spFill.style.width = "0%";
+            spCur.textContent = "0:00";
+            spDur.textContent = fmtTime(dur);
+          } else {
+            // keep local anchor; optionally correct tiny drift if needed
+            // (we intentionally do NOT jump to remote timestamp)
+          }
+
           spBarWrap.hidden = false;
-          startSpotifyBar(startMs, endMs, trackChanged);
+          startSpotifyBar(localSpotify.startLocal, localSpotify.endLocal);
         } else {
           spBarWrap.hidden = true;
           stopSpotifyBar();
         }
       } else {
         lastTrackId = null;
-        spZeroUntil = 0;
+        localSpotify = { trackId: null, startLocal: 0, endLocal: 0, duration: 0 };
 
         spTrack.textContent = "Not listening to anything right now";
         spArtist.textContent = "—";

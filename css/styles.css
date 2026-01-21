@@ -286,3 +286,178 @@ width: auto;
 @keyframes snow {
   to { transform: translate3d(var(--drift), 110vh, 0); }
 }
+
+/* Discord RPC n stuff */
+.rpc-card{
+  width: auto;
+  padding: 24px 26px;
+  border-radius: 22px;
+  background: transparent;
+  border: none;
+  backdrop-filter: none;
+  box-shadow: 0 0 40px rgba(120, 0, 255, 0.12);
+  color: #eaeaf0;
+  font-family: IBMBIOS2y;
+}
+
+.rpc-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom: 14px;
+  gap: 16px;
+}
+
+.rpc-profile{
+  display:flex;
+  align-items:center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.rpc-avatar{
+  width: 64px;
+  height: 64px;
+  border-radius: 999px;
+  object-fit: cover;
+  background: transparent;
+  border: none;
+  backdrop-filter: none;
+  flex: 0 0 auto;
+}
+
+.rpc-who{
+  display:flex;
+  flex-direction:column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.rpc-title{
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: .2px;
+  line-height: 1.1;
+}
+
+.rpc-name{
+  font-size: 15px;
+  opacity: .78;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 300px;
+}
+
+.rpc-pill{
+  display:flex;
+  align-items:center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: rgba(120, 0, 255, 0.18);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  border: 1px solid rgba(255,255,255,.12);
+  font-size: 15px;
+  flex: 0 0 auto;
+}
+
+.rpc-dot{
+  width:12px;
+  height:12px;
+  border-radius:999px;
+  display:inline-block;
+  background: #747f8d;
+}
+
+.rpc-block {
+  margin-top: 16px;
+}
+
+.rpc-label{
+  font-size: 15px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  opacity:.65;
+  margin-bottom: 8px;
+}
+
+.rpc-line{
+  display:flex;
+  align-items:center;
+  gap: 14px;
+}
+
+.rpc-icon{
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.10);
+  flex: 0 0 auto;
+}
+
+.rpc-cover{
+  width: 64px;
+  height: 64px;
+  border-radius: 14px;
+  object-fit: cover;
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.10);
+  flex: 0 0 auto;
+}
+
+.rpc-value{
+  font-size: 22px;
+  font-weight: 750;
+  line-height: 1.15;
+}
+
+.rpc-sub{
+  margin-top: 6px;
+  font-size: 16px;
+  opacity:.8;
+}
+
+.rpc-sep{
+  height:1px;
+  background: rgba(255,255,255,.08);
+  margin: 20px 0;
+}
+
+.rpc-dot,
+.rpc-value,
+.rpc-sub,
+.rpc-name {
+  transition: all .25s ease;
+}
+
+.sp-bar-wrap {
+  margin-top: 10px;
+}
+
+.sp-times{
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  opacity: .75;
+  margin-bottom: 6px;
+}
+
+.sp-bar{
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.10);
+  border: 1px solid rgba(255,255,255,.10);
+  overflow: hidden;
+}
+
+.sp-bar-fill{
+  height: 100%;
+  width: 0%;
+  border-radius: 999px;
+  background: rgba(30, 215, 96, .85);
+  transition: width .25s linear;
+}

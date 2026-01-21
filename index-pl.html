@@ -28,14 +28,12 @@
     const isPL = lang.startsWith("pl") || langs.some(l => l.startsWith("pl"));
 
     if (!isPL) {
-        // jeśli jesteśmy na PL i przeglądarka nie-PL -> wróć na EN
+        // jeśli jesteś na PL i przeglądarka nie-PL -> wróć na EN
         location.replace("index.html");
     }
     })();
     </script>
-
-
-
+    <script src="js/rpc-pl.js"></script>
 </head>
 
 <!-- wiem że przyszedłeś tutaj po kod,
@@ -70,6 +68,56 @@
     <h1>Podstawowe Info:</h1>
     <h2>Zaimki: On/On</h2>
     <h2><a href="https://pl.wikipedia.org/wiki/Aseksualno%C5%9B%C4%87">Aseksualny</a></h2>
+
+    <div class="rpc-card" id="rpc">
+      <div class="rpc-top">
+        <div class="rpc-profile">
+          <img class="rpc-avatar" id="rpcAvatar" alt="Avatar">
+          <div class="rpc-who">
+            <div class="rpc-title">(Discord) Aktywność</div> <!-- fajne aktywnosci discord btw -->
+            <div class="rpc-name" id="rpcName">—</div>
+          </div>
+        </div>
+
+        <div class="rpc-pill">
+          <span class="rpc-dot" id="rpcDot"></span>
+          <span class="rpc-status-text" id="rpcStatusText">Łączenie…</span>
+        </div>
+      </div>
+
+      <div class="rpc-block">
+        <div class="rpc-label">Gra w</div>
+        <div class="rpc-line">
+          <img class="rpc-icon" id="gameIcon" alt="" hidden>
+          <div>
+            <div class="rpc-value" id="rpcGame">—</div>
+            <div class="rpc-sub" id="rpcDetails">—</div>
+          </div>
+        </div>
+      </div>
+
+        <div class="rpc-sep"></div>
+
+        <div class="rpc-block spotify">
+          <div class="rpc-label">(Spotify) Słucha</div>
+            <div class="rpc-line">
+              <img class="rpc-cover" id="spCover" alt="" hidden>
+            <div>
+            <div class="rpc-value" id="spTrack">—</div>
+            <div class="rpc-sub" id="spArtist">—</div>
+            <div class="sp-bar-wrap" id="spBarWrap" hidden>
+            <div class="sp-times">
+              <div id="spCur">0:00</div>
+              <div id="spDur">0:00</div>
+            </div>
+              <div class="sp-bar">
+                <div class="sp-bar-fill" id="spFill"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <hr id="line" />
 

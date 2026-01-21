@@ -87,6 +87,9 @@ document.addEventListener("DOMContentLoaded", () => {
   // Track-change detection so the bar resets to 0:00 immediately
   let lastTrackId = null;
 
+  // Keep 0:00 briefly after track change so it doesn't jump to 0:50 on some devices
+  let spZeroUntil = 0;
+
   // Server/client time offset (helps if someone’s phone clock is off)
   let timeOffsetMs = 0; // serverNow ~= Date.now() + timeOffsetMs
   function nowMs() { return Date.now() + timeOffsetMs; }
@@ -100,6 +103,15 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function startSpotifyBar(startMs, endMs, forceResetToZero = false) {
+    const now = nowMs();
+
+    // If track changed but timestamps already look "old", clamp to now to avoid jumps (0:50 etc.)
+    if (forceResetToZero && (now - startMs) > 5000) {
+      const dur = endMs - startMs;
+      startMs = now;
+      endMs = now + dur;
+    }
+
     spStart = startMs;
     spEnd = endMs;
 
@@ -108,26 +120,29 @@ document.addEventListener("DOMContentLoaded", () => {
     const dur = spEnd - spStart;
     spDur.textContent = fmtTime(dur);
 
-    // Force visual reset (e.g. when track changes)
+    // Force visual reset + grace period (so 0:00 is actually visible)
     if (forceResetToZero) {
+      spZeroUntil = now + 1200; // 1.2s grace period
       spFill.style.width = "0%";
       spCur.textContent = "0:00";
     }
 
     const tick = () => {
+      const now2 = nowMs();
       const dur2 = spEnd - spStart;
       if (dur2 <= 0) return;
 
-      const cur = nowMs() - spStart;
-      const pct = Math.min(100, Math.max(0, (cur / dur2) * 100));
+      // During grace period keep 0:00 instead of jumping
+      const cur = (now2 < spZeroUntil) ? 0 : (now2 - spStart);
 
+      const pct = Math.min(100, Math.max(0, (cur / dur2) * 100));
       spFill.style.width = pct + "%";
       spCur.textContent = fmtTime(cur);
       spDur.textContent = fmtTime(dur2);
     };
 
     tick();
-    spTimer = setInterval(tick, 500);
+    spTimer = setInterval(tick, 250);
   }
 
   function stopSpotifyBar() {
@@ -135,6 +150,7 @@ document.addEventListener("DOMContentLoaded", () => {
     spTimer = null;
     spStart = 0;
     spEnd = 0;
+    spZeroUntil = 0;
     spFill.style.width = "0%";
     spCur.textContent = "0:00";
     spDur.textContent = "0:00";
@@ -185,7 +201,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const startMs = data.spotify.timestamps?.start;
         const endMs = data.spotify.timestamps?.end;
 
-        // If track changed -> force bar/timer back to 0:00 so it won't "start at 50s"
+        // If track changed -> reset bar/timer to 0:00 and clamp if needed
         const trackChanged = (trackId !== lastTrackId);
         lastTrackId = trackId;
 
@@ -198,6 +214,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       } else {
         lastTrackId = null;
+        spZeroUntil = 0;
 
         spTrack.textContent = "Not listening to anything right now";
         spArtist.textContent = "—";

@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // Używamy proxy na Mojej domenie (najbardziej niezawodne na Bluehost)
-  const REST_URL = new URL("../rpc-data.php", document.baseURI).toString();
+  const USER_ID = "764834366161420299";
+  const API_URL = `https://api.lanyard.rest/v1/users/${USER_ID}`;
 
   // ---- Elementy
   const dot = document.getElementById("rpcDot");
@@ -13,12 +13,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const gameEl = document.getElementById("rpcGame");
   const detailsEl = document.getElementById("rpcDetails");
 
-  // Spotify: tylko tekst + okładka (pasek robi PHP + rpc-progress.js)
   const spCover = document.getElementById("spCover");
   const spTrack = document.getElementById("spTrack");
   const spArtist = document.getElementById("spArtist");
 
-  // ---- sprawdzenie poprawności
+  // ---- sprawdzenie poprawności (pomocne, gdy identyfikatory nie pasują)
   const required = { dot, statusText, avatar, nameEl, gameIcon, gameEl, detailsEl, spCover, spTrack, spArtist };
   for (const [k, v] of Object.entries(required)) {
     if (!v) {
@@ -28,7 +27,13 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ---- status
-  const statusColor = { online: "#3ba55d", idle: "#faa61a", dnd: "#ed4245", offline: "#747f8d" };
+  const statusColor = {
+    online: "#3ba55d",
+    idle: "#faa61a",
+    dnd: "#ed4245",
+    offline: "#747f8d"
+  };
+
   function statusLabel(s) {
     return s === "online" ? "Online"
       : s === "idle" ? "Zaraz Wracam"
@@ -38,7 +43,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // ---- Awatar (Discord)
   function discordAvatarUrl(user) {
-    if (user?.avatar) return `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=128`;
+    if (user?.avatar) {
+      return `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=128`;
+    }
     const disc = Number(user?.discriminator || 0);
     const idx = Number.isFinite(disc) ? (disc % 5) : 0;
     return `https://cdn.discordapp.com/embed/avatars/${idx}.png`;
@@ -52,93 +59,83 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function activityAssetUrl(activity, which = "large") {
     if (!activity?.application_id || !activity?.assets) return null;
+
     const key = which === "small" ? activity.assets.small_image : activity.assets.large_image;
-    if (!key || key.startsWith("mp:")) return null;
+    if (!key) return null;
+
+    if (key.startsWith("mp:")) return null;
+
     return `https://cdn.discordapp.com/app-assets/${activity.application_id}/${key}.png`;
   }
 
-  // ---- Render
-  function render(data) {
-    // profil
-    const user = data.discord_user;
-    nameEl.textContent = user?.global_name || user?.username || "—";
-    avatar.src = discordAvatarUrl(user);
+  // Główna aktualizacja
+  async function update() {
+    try {
+      const res = await fetch(`${API_URL}?_=${Date.now()}`, { cache: "no-store" });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
-    // status
-    const st = data.discord_status || "offline";
-    dot.style.background = statusColor[st] || statusColor.offline;
-    statusText.textContent = statusLabel(st);
+      const json = await res.json();
+      const data = json.data;
+      if (!data) throw new Error("0 danych");
 
-    // spotify: tylko tekst + okładka
-    if (data.spotify?.track_id) {
-      spTrack.textContent = data.spotify.song || "—";
-      spArtist.textContent = data.spotify.artist || "—";
+      const user = data.discord_user;
+      nameEl.textContent = user?.global_name || user?.username || "—";
+      avatar.src = discordAvatarUrl(user);
 
-      if (data.spotify.album_art_url) {
-        spCover.src = data.spotify.album_art_url;
-        spCover.hidden = false;
+      // Status
+      const st = data.discord_status || "offline";
+      dot.style.background = statusColor[st] || statusColor.offline;
+      statusText.textContent = statusLabel(st);
+
+      // Spotify (BEZ timera/paska)
+      if (data.spotify?.track_id) {
+        spTrack.textContent = data.spotify.song || "—";
+        spArtist.textContent = data.spotify.artist || "—";
+
+        if (data.spotify.album_art_url) {
+          spCover.src = data.spotify.album_art_url;
+          spCover.hidden = false;
+        } else {
+          spCover.hidden = true;
+        }
       } else {
+        spTrack.textContent = "Nie słucham żadnej muzyki w tej chwili";
+        spArtist.textContent = "—";
         spCover.hidden = true;
       }
-    } else {
-      spTrack.textContent = "Nie słucham żadnej muzyki w tej chwili";
-      spArtist.textContent = "—";
-      spCover.hidden = true;
-    }
 
-    // gra
-    const game = pickGame(data.activities || []);
-    if (game) {
-      gameEl.textContent = game.name || "—";
-      detailsEl.textContent = [game.details, game.state].filter(Boolean).join(" • ") || "—";
+      // Gra + Szczegóły + Ikona
+      const game = pickGame(data.activities || []);
+      if (game) {
+        gameEl.textContent = game.name || "—";
+        detailsEl.textContent = [game.details, game.state].filter(Boolean).join(" • ") || "—";
 
-      const iconUrl = activityAssetUrl(game, "large") || activityAssetUrl(game, "small");
-      if (iconUrl) { gameIcon.src = iconUrl; gameIcon.hidden = false; }
-      else gameIcon.hidden = true;
-    } else {
-      gameEl.textContent = "Nie gram w żadną grę w tej chwili";
-      detailsEl.textContent = "—";
-      gameIcon.hidden = true;
-    }
-  }
-
-  // ---- Fetch loop
-  let timer = null;
-
-  async function updateOnce() {
-    const res = await fetch(`${REST_URL}?_=${Date.now()}`, {
-      cache: "no-store",
-      credentials: "omit",
-    });
-
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
-    const json = await res.json();
-    if (!json?.data) throw new Error("0 danych");
-    render(json.data);
-  }
-
-  function start() {
-    if (timer) return;
-    statusText.textContent = "Łączenie…";
-
-    updateOnce().catch(err => {
-      console.error("[Lanyard widget] aktualizacja nie powiodła się:", err);
+        const iconUrl = activityAssetUrl(game, "large") || activityAssetUrl(game, "small");
+        if (iconUrl) {
+          gameIcon.src = iconUrl;
+          gameIcon.hidden = false;
+        } else {
+          gameIcon.hidden = true;
+        }
+      } else {
+        gameEl.textContent = "Nie gram w żadną grę w tej chwili";
+        detailsEl.textContent = "—";
+        gameIcon.hidden = true;
+      }
+    } catch (e) {
+      console.error("[Lanyard widget] aktualizacja nie powiodła się:", e);
       statusText.textContent = "Error";
       dot.style.background = statusColor.offline;
       detailsEl.textContent = "Nie można załadować Aktywności";
-    });
-
-    timer = setInterval(() => {
-      updateOnce().catch(err => console.error("[Lanyard widget] tick failed:", err));
-    }, 3000);
+    }
   }
+
+  update();
+  setInterval(update, 3000);
 
   // Na telefonach timery są throttlowane, więc dociągamy dane po powrocie
   document.addEventListener("visibilitychange", () => {
-    if (!document.hidden) updateOnce().catch(() => {});
+    if (!document.hidden) update();
   });
-  window.addEventListener("focus", () => updateOnce().catch(() => {}));
-
-  start();
+  window.addEventListener("focus", () => update());
 });

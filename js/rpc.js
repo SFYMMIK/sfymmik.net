@@ -84,6 +84,13 @@ document.addEventListener("DOMContentLoaded", () => {
   let spStart = 0;
   let spEnd = 0;
 
+  // Track-change detection so the bar resets to 0:00 immediately
+  let lastTrackId = null;
+
+  // Server/client time offset (helps if someone’s phone clock is off)
+  let timeOffsetMs = 0; // serverNow ~= Date.now() + timeOffsetMs
+  function nowMs() { return Date.now() + timeOffsetMs; }
+
   function fmtTime(ms) {
     ms = Math.max(0, ms | 0);
     const total = Math.floor(ms / 1000);
@@ -92,23 +99,31 @@ document.addEventListener("DOMContentLoaded", () => {
     return `${m}:${String(s).padStart(2, "0")}`;
   }
 
-  function startSpotifyBar(startMs, endMs) {
+  function startSpotifyBar(startMs, endMs, forceResetToZero = false) {
     spStart = startMs;
     spEnd = endMs;
 
     if (spTimer) clearInterval(spTimer);
 
+    const dur = spEnd - spStart;
+    spDur.textContent = fmtTime(dur);
+
+    // Force visual reset (e.g. when track changes)
+    if (forceResetToZero) {
+      spFill.style.width = "0%";
+      spCur.textContent = "0:00";
+    }
+
     const tick = () => {
-      const now = Date.now();
-      const dur = spEnd - spStart;
-      const cur = now - spStart;
+      const dur2 = spEnd - spStart;
+      if (dur2 <= 0) return;
 
-      if (dur <= 0) return;
+      const cur = nowMs() - spStart;
+      const pct = Math.min(100, Math.max(0, (cur / dur2) * 100));
 
-      const pct = Math.min(100, Math.max(0, (cur / dur) * 100));
       spFill.style.width = pct + "%";
       spCur.textContent = fmtTime(cur);
-      spDur.textContent = fmtTime(dur);
+      spDur.textContent = fmtTime(dur2);
     };
 
     tick();
@@ -118,6 +133,8 @@ document.addEventListener("DOMContentLoaded", () => {
   function stopSpotifyBar() {
     if (spTimer) clearInterval(spTimer);
     spTimer = null;
+    spStart = 0;
+    spEnd = 0;
     spFill.style.width = "0%";
     spCur.textContent = "0:00";
     spDur.textContent = "0:00";
@@ -126,8 +143,18 @@ document.addEventListener("DOMContentLoaded", () => {
   // Main update
   async function update() {
     try {
-      const res = await fetch(API_URL, { cache: "no-store" });
+      // Cache-bust helps some setups/CDNs/browsers avoid returning stale presence
+      const res = await fetch(`${API_URL}?_=${Date.now()}`, { cache: "no-store" });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+      // Use server time to reduce phone clock drift
+      const dateHdr = res.headers.get("Date");
+      if (dateHdr) {
+        const serverNow = Date.parse(dateHdr);
+        if (Number.isFinite(serverNow)) {
+          timeOffsetMs = serverNow - Date.now();
+        }
+      }
 
       const json = await res.json();
       const data = json.data;
@@ -154,17 +181,24 @@ document.addEventListener("DOMContentLoaded", () => {
           spCover.hidden = true;
         }
 
+        const trackId = data.spotify.track_id;
         const startMs = data.spotify.timestamps?.start;
         const endMs = data.spotify.timestamps?.end;
 
+        // If track changed -> force bar/timer back to 0:00 so it won't "start at 50s"
+        const trackChanged = (trackId !== lastTrackId);
+        lastTrackId = trackId;
+
         if (startMs && endMs) {
           spBarWrap.hidden = false;
-          startSpotifyBar(startMs, endMs);
+          startSpotifyBar(startMs, endMs, trackChanged);
         } else {
           spBarWrap.hidden = true;
           stopSpotifyBar();
         }
       } else {
+        lastTrackId = null;
+
         spTrack.textContent = "Not listening to anything right now";
         spArtist.textContent = "—";
         spCover.hidden = true;
@@ -201,6 +235,12 @@ document.addEventListener("DOMContentLoaded", () => {
       stopSpotifyBar();
     }
   }
+
+  // Refresh instantly when the page becomes visible/focused (mobile browsers throttle timers)
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) update();
+  });
+  window.addEventListener("focus", () => update());
 
   update();
   setInterval(update, 3000);

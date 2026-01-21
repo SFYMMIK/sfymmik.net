@@ -1,6 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
   const USER_ID = "764834366161420299";
-
   const REST_URL = `https://api.lanyard.rest/v1/users/${USER_ID}`;
   const WS_URL = "wss://api.lanyard.rest/socket";
 
@@ -19,7 +18,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const spTrack = document.getElementById("spTrack");
   const spArtist = document.getElementById("spArtist");
 
-  // Spotify bar elements (must exist in HTML for the bar to work)
   const spBarWrap = document.getElementById("spBarWrap");
   const spFill = document.getElementById("spFill");
   const spCur = document.getElementById("spCur");
@@ -39,26 +37,20 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // ---- Status
-  const statusColor = {
-    online: "#3ba55d",
-    idle: "#faa61a",
-    dnd: "#ed4245",
-    offline: "#747f8d"
-  };
+  // Show diagnostic info in UI
+  function setDiag(text) {
+    statusText.textContent = text;
+  }
 
+  // ---- Status
+  const statusColor = { online: "#3ba55d", idle: "#faa61a", dnd: "#ed4245", offline: "#747f8d" };
   function statusLabel(s) {
-    return s === "online" ? "Online"
-      : s === "idle" ? "Idle"
-      : s === "dnd" ? "Do Not Disturb"
-      : "Offline";
+    return s === "online" ? "Online" : s === "idle" ? "Idle" : s === "dnd" ? "Do Not Disturb" : "Offline";
   }
 
   // ---- Discord Avatar
   function discordAvatarUrl(user) {
-    if (user?.avatar) {
-      return `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=128`;
-    }
+    if (user?.avatar) return `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=128`;
     const disc = Number(user?.discriminator || 0);
     const idx = Number.isFinite(disc) ? (disc % 5) : 0;
     return `https://cdn.discordapp.com/embed/avatars/${idx}.png`;
@@ -72,16 +64,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function activityAssetUrl(activity, which = "large") {
     if (!activity?.application_id || !activity?.assets) return null;
-
     const key = which === "small" ? activity.assets.small_image : activity.assets.large_image;
-    if (!key) return null;
-
-    if (key.startsWith("mp:")) return null;
-
+    if (!key || key.startsWith("mp:")) return null;
     return `https://cdn.discordapp.com/app-assets/${activity.application_id}/${key}.png`;
   }
 
-  // ---- Spotify progress bar (REAL timestamps)
+  // ---- Spotify progress bar
   let spTimer = null;
   let spStart = 0;
   let spEnd = 0;
@@ -104,10 +92,8 @@ document.addEventListener("DOMContentLoaded", () => {
       const now = Date.now();
       const dur = spEnd - spStart;
       if (dur <= 0) return;
-
       const cur = now - spStart;
       const pct = Math.min(100, Math.max(0, (cur / dur) * 100));
-
       spFill.style.width = pct + "%";
       spCur.textContent = fmtTime(cur);
       spDur.textContent = fmtTime(dur);
@@ -127,38 +113,26 @@ document.addEventListener("DOMContentLoaded", () => {
     spDur.textContent = "0:00";
   }
 
-  // ---- Render a Lanyard "data" payload (from WS INIT_STATE / PRESENCE_UPDATE or REST)
-  function render(data) {
-    // profile
+  // ---- Render
+  function render(data, sourceLabel) {
     const user = data.discord_user;
     nameEl.textContent = user?.global_name || user?.username || "—";
     avatar.src = discordAvatarUrl(user);
 
-    // status
     const st = data.discord_status || "offline";
     dot.style.background = statusColor[st] || statusColor.offline;
-    statusText.textContent = statusLabel(st);
+    statusText.textContent = `${statusLabel(st)}${sourceLabel ? ` • ${sourceLabel}` : ""}`;
 
-    // spotify
     if (data.spotify?.track_id) {
       spTrack.textContent = data.spotify.song || "—";
       spArtist.textContent = data.spotify.artist || "—";
-
-      if (data.spotify.album_art_url) {
-        spCover.src = data.spotify.album_art_url;
-        spCover.hidden = false;
-      } else spCover.hidden = true;
+      if (data.spotify.album_art_url) { spCover.src = data.spotify.album_art_url; spCover.hidden = false; }
+      else spCover.hidden = true;
 
       const startMs = data.spotify.timestamps?.start;
       const endMs = data.spotify.timestamps?.end;
-
-      if (startMs && endMs) {
-        spBarWrap.hidden = false;
-        startSpotifyBar(startMs, endMs);
-      } else {
-        spBarWrap.hidden = true;
-        stopSpotifyBar();
-      }
+      if (startMs && endMs) { spBarWrap.hidden = false; startSpotifyBar(startMs, endMs); }
+      else { spBarWrap.hidden = true; stopSpotifyBar(); }
     } else {
       spTrack.textContent = "Not listening to anything right now";
       spArtist.textContent = "—";
@@ -167,19 +141,13 @@ document.addEventListener("DOMContentLoaded", () => {
       stopSpotifyBar();
     }
 
-    // game
     const game = pickGame(data.activities || []);
     if (game) {
       gameEl.textContent = game.name || "—";
       detailsEl.textContent = [game.details, game.state].filter(Boolean).join(" • ") || "—";
-
       const iconUrl = activityAssetUrl(game, "large") || activityAssetUrl(game, "small");
-      if (iconUrl) {
-        gameIcon.src = iconUrl;
-        gameIcon.hidden = false;
-      } else {
-        gameIcon.hidden = true;
-      }
+      if (iconUrl) { gameIcon.src = iconUrl; gameIcon.hidden = false; }
+      else gameIcon.hidden = true;
     } else {
       gameEl.textContent = "Not playing any game right now";
       detailsEl.textContent = "—";
@@ -188,89 +156,56 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // =========================
-  // REST fallback
+  // REST
   // =========================
   let restTimer = null;
-  let restActive = false;
-
-  async function restUpdate() {
-    try {
-      const res = await fetch(`${REST_URL}?_=${Date.now()}`, { cache: "no-store" });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const json = await res.json();
-      if (json?.data) render(json.data);
-    } catch (e) {
-      console.error("[Lanyard widget] REST update failed:", e);
-    }
+  async function restOnce() {
+    const res = await fetch(`${REST_URL}?_=${Date.now()}`, {
+      cache: "no-store",
+      // sometimes hosting/proxies behave better with this:
+      mode: "cors",
+      credentials: "omit",
+    });
+    if (!res.ok) throw new Error(`REST HTTP ${res.status}`);
+    const json = await res.json();
+    if (!json?.data) throw new Error("REST: no data");
+    render(json.data, "REST");
   }
 
   function startREST() {
     if (restTimer) return;
-    restActive = true;
-    console.warn("[Lanyard widget] Using REST fallback (WebSocket blocked/failed).");
-    restUpdate();
-    restTimer = setInterval(restUpdate, 3000);
+    setDiag("Connecting… (REST)");
+    restOnce().catch(err => {
+      console.error("[Lanyard widget] REST failed:", err);
+      setDiag("REST blocked");
+    });
+    restTimer = setInterval(() => {
+      restOnce().catch(err => console.error("[Lanyard widget] REST tick failed:", err));
+    }, 3000);
   }
 
   function stopREST() {
-    restActive = false;
     if (!restTimer) return;
     clearInterval(restTimer);
     restTimer = null;
   }
 
   // =========================
-  // WebSocket (preferred)
+  // WebSocket
   // =========================
   let ws = null;
   let hb = null;
-  let wsOpen = false;
-  let wsHandshakeTimer = null;
-  let reconnectTimer = null;
-
-  function cleanupWS() {
-    if (wsHandshakeTimer) { clearTimeout(wsHandshakeTimer); wsHandshakeTimer = null; }
-    if (reconnectTimer) { clearTimeout(reconnectTimer); reconnectTimer = null; }
-    if (hb) { clearInterval(hb); hb = null; }
-
-    wsOpen = false;
-
-    if (ws) {
-      try { ws.close(); } catch {}
-      ws = null;
-    }
-  }
-
-  function scheduleReconnect() {
-    if (reconnectTimer) return;
-    reconnectTimer = setTimeout(() => {
-      reconnectTimer = null;
-      connectWS();
-    }, 1500);
-  }
 
   function connectWS() {
-    cleanupWS();
-
-    // If WS doesn't open quickly, fall back
-    wsHandshakeTimer = setTimeout(() => {
-      if (!wsOpen) {
-        cleanupWS();
-        startREST();
-      }
-    }, 1800);
-
     try {
       ws = new WebSocket(WS_URL);
     } catch (e) {
-      startREST();
-      return;
+      console.error("[Lanyard widget] WS create failed:", e);
+      ws = null;
+      return false;
     }
 
-    ws.addEventListener("open", () => {
-      wsOpen = true;
-      stopREST(); // WS works -> stop REST fallback
-    });
+    setDiag("Connecting… (WS)");
 
     ws.addEventListener("message", (ev) => {
       let msg;
@@ -278,10 +213,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (msg.op === 1) {
         const interval = msg.d?.heartbeat_interval ?? 30000;
-
-        // subscribe
         ws.send(JSON.stringify({ op: 2, d: { subscribe_to_id: USER_ID } }));
-
         if (hb) clearInterval(hb);
         hb = setInterval(() => {
           if (ws && ws.readyState === WebSocket.OPEN) {
@@ -292,38 +224,55 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       if (msg.op === 0) {
-        const t = msg.t;
-        const d = msg.d;
-
-        if (t === "INIT_STATE") {
-          const state = d?.[USER_ID];
-          if (state) render(state);
-        } else if (t === "PRESENCE_UPDATE") {
-          if (d) render(d);
+        if (msg.t === "INIT_STATE") {
+          const state = msg.d?.[USER_ID];
+          if (state) render(state, "WS");
+        } else if (msg.t === "PRESENCE_UPDATE") {
+          if (msg.d) render(msg.d, "WS");
         }
       }
     });
 
-    ws.addEventListener("close", () => {
-      cleanupWS();
-      startREST();       // keep working even if WS dies
-      scheduleReconnect();
+    ws.addEventListener("open", () => {
+      stopREST(); // WS works => stop REST
+      setDiag("Connected (WS)");
     });
 
-    ws.addEventListener("error", () => {
-      // often followed by close; fallback immediately anyway
+    ws.addEventListener("close", (ev) => {
+      console.warn("[Lanyard widget] WS closed:", ev.code, ev.reason);
+      if (hb) { clearInterval(hb); hb = null; }
+      ws = null;
+      // keep alive via REST
+      startREST();
+      setTimeout(connectWS, 2000);
+    });
+
+    ws.addEventListener("error", (e) => {
+      console.error("[Lanyard widget] WS error:", e);
+      // fallback to REST
       startREST();
     });
+
+    return true;
   }
 
-  // Start WS (with fallback)
-  connectWS();
+  // =========================
+  // Start: REST immediately, then try WS
+  // =========================
+  startREST();
 
-  // If user comes back to tab and we're on REST, do an instant refresh
+  // Try WS after a short delay (so even if WS blocked, REST already works)
+  setTimeout(() => {
+    connectWS();
+  }, 400);
+
+  // If user returns to tab and REST is active, refresh now
   document.addEventListener("visibilitychange", () => {
-    if (!document.hidden && restActive) restUpdate();
+    if (!document.hidden && restTimer) {
+      restOnce().catch(() => {});
+    }
   });
   window.addEventListener("focus", () => {
-    if (restActive) restUpdate();
+    if (restTimer) restOnce().catch(() => {});
   });
 });

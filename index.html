@@ -15,7 +15,8 @@
   <link rel="stylesheet" href="css/styles.css" />
   <link rel="icon" type="image/x-icon" href="pfp.jpg">
   <title>SfymmiK's Webpage</title>
-  <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; connect-src * wss: https:;">
+  <meta http-equiv="Content-Security-Policy"
+      content="connect-src 'self' https://api.lanyard.rest wss://api.lanyard.rest; img-src 'self' https: data:;">
   <script>
   window.addEventListener("load", () => {
     document.body.classList.add("loaded");

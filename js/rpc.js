@@ -1,6 +1,9 @@
 document.addEventListener("DOMContentLoaded", () => {
   const USER_ID = "764834366161420299";
 
+  const REST_URL = `https://api.lanyard.rest/v1/users/${USER_ID}`;
+  const WS_URL = "wss://api.lanyard.rest/socket";
+
   // ---- Elements
   const dot = document.getElementById("rpcDot");
   const statusText = document.getElementById("rpcStatusText");
@@ -124,7 +127,7 @@ document.addEventListener("DOMContentLoaded", () => {
     spDur.textContent = "0:00";
   }
 
-  // ---- Render a Lanyard "data" payload (from WS INIT_STATE / PRESENCE_UPDATE)
+  // ---- Render a Lanyard "data" payload (from WS INIT_STATE / PRESENCE_UPDATE or REST)
   function render(data) {
     // profile
     const user = data.discord_user;
@@ -184,24 +187,95 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // ---- Lanyard WebSocket
+  // =========================
+  // REST fallback
+  // =========================
+  let restTimer = null;
+  let restActive = false;
+
+  async function restUpdate() {
+    try {
+      const res = await fetch(`${REST_URL}?_=${Date.now()}`, { cache: "no-store" });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = await res.json();
+      if (json?.data) render(json.data);
+    } catch (e) {
+      console.error("[Lanyard widget] REST update failed:", e);
+    }
+  }
+
+  function startREST() {
+    if (restTimer) return;
+    restActive = true;
+    console.warn("[Lanyard widget] Using REST fallback (WebSocket blocked/failed).");
+    restUpdate();
+    restTimer = setInterval(restUpdate, 3000);
+  }
+
+  function stopREST() {
+    restActive = false;
+    if (!restTimer) return;
+    clearInterval(restTimer);
+    restTimer = null;
+  }
+
+  // =========================
+  // WebSocket (preferred)
+  // =========================
   let ws = null;
   let hb = null;
+  let wsOpen = false;
+  let wsHandshakeTimer = null;
+  let reconnectTimer = null;
 
-  function connect() {
-    if (ws) ws.close();
+  function cleanupWS() {
+    if (wsHandshakeTimer) { clearTimeout(wsHandshakeTimer); wsHandshakeTimer = null; }
+    if (reconnectTimer) { clearTimeout(reconnectTimer); reconnectTimer = null; }
+    if (hb) { clearInterval(hb); hb = null; }
 
-    ws = new WebSocket("wss://api.lanyard.rest/socket");
+    wsOpen = false;
+
+    if (ws) {
+      try { ws.close(); } catch {}
+      ws = null;
+    }
+  }
+
+  function scheduleReconnect() {
+    if (reconnectTimer) return;
+    reconnectTimer = setTimeout(() => {
+      reconnectTimer = null;
+      connectWS();
+    }, 1500);
+  }
+
+  function connectWS() {
+    cleanupWS();
+
+    // If WS doesn't open quickly, fall back
+    wsHandshakeTimer = setTimeout(() => {
+      if (!wsOpen) {
+        cleanupWS();
+        startREST();
+      }
+    }, 1800);
+
+    try {
+      ws = new WebSocket(WS_URL);
+    } catch (e) {
+      startREST();
+      return;
+    }
 
     ws.addEventListener("open", () => {
-      // connected, waiting for HELLO
+      wsOpen = true;
+      stopREST(); // WS works -> stop REST fallback
     });
 
     ws.addEventListener("message", (ev) => {
       let msg;
       try { msg = JSON.parse(ev.data); } catch { return; }
 
-      // op codes: 1=HELLO (gives heartbeat_interval), 0=EVENT, 2=INIT_STATE/PRESENCE_UPDATE
       if (msg.op === 1) {
         const interval = msg.d?.heartbeat_interval ?? 30000;
 
@@ -218,7 +292,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       if (msg.op === 0) {
-        // events: INIT_STATE or PRESENCE_UPDATE
         const t = msg.t;
         const d = msg.d;
 
@@ -232,16 +305,25 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     ws.addEventListener("close", () => {
-      if (hb) clearInterval(hb);
-      hb = null;
-      // auto-reconnect
-      setTimeout(connect, 1500);
+      cleanupWS();
+      startREST();       // keep working even if WS dies
+      scheduleReconnect();
     });
 
     ws.addEventListener("error", () => {
-      // let close handler reconnect
+      // often followed by close; fallback immediately anyway
+      startREST();
     });
   }
 
-  connect();
+  // Start WS (with fallback)
+  connectWS();
+
+  // If user comes back to tab and we're on REST, do an instant refresh
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden && restActive) restUpdate();
+  });
+  window.addEventListener("focus", () => {
+    if (restActive) restUpdate();
+  });
 });

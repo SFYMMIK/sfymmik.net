@@ -1,6 +1,9 @@
 document.addEventListener("DOMContentLoaded", () => {
   const USER_ID = "764834366161420299";
 
+  const REST_URL = `https://api.lanyard.rest/v1/users/${USER_ID}`;
+  const WS_URL = "wss://api.lanyard.rest/socket";
+
   // ---- Elementy
   const dot = document.getElementById("rpcDot");
   const statusText = document.getElementById("rpcStatusText");
@@ -124,7 +127,7 @@ document.addEventListener("DOMContentLoaded", () => {
     spDur.textContent = "0:00";
   }
 
-  // Render danych z Lanyard (z WS INIT_STATE / PRESENCE_UPDATE)
+  // Render danych z Lanyard (z WS INIT_STATE / PRESENCE_UPDATE lub REST)
   function render(data) {
     // profil
     const user = data.discord_user;
@@ -184,14 +187,90 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // ---- Lanyard WebSocket
+  // =========================
+  // REST fallback
+  // =========================
+  let restTimer = null;
+  let restActive = false;
+
+  async function restUpdate() {
+    try {
+      const res = await fetch(`${REST_URL}?_=${Date.now()}`, { cache: "no-store" });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = await res.json();
+      if (json?.data) render(json.data);
+    } catch (e) {
+      console.error("[Lanyard widget] REST update failed:", e);
+    }
+  }
+
+  function startREST() {
+    if (restTimer) return;
+    restActive = true;
+    console.warn("[Lanyard widget] Używam REST (WebSocket zablokowany/nie działa).");
+    restUpdate();
+    restTimer = setInterval(restUpdate, 3000);
+  }
+
+  function stopREST() {
+    restActive = false;
+    if (!restTimer) return;
+    clearInterval(restTimer);
+    restTimer = null;
+  }
+
+  // =========================
+  // WebSocket (preferowany)
+  // =========================
   let ws = null;
   let hb = null;
+  let wsOpen = false;
+  let wsHandshakeTimer = null;
+  let reconnectTimer = null;
 
-  function connect() {
-    if (ws) ws.close();
+  function cleanupWS() {
+    if (wsHandshakeTimer) { clearTimeout(wsHandshakeTimer); wsHandshakeTimer = null; }
+    if (reconnectTimer) { clearTimeout(reconnectTimer); reconnectTimer = null; }
+    if (hb) { clearInterval(hb); hb = null; }
 
-    ws = new WebSocket("wss://api.lanyard.rest/socket");
+    wsOpen = false;
+
+    if (ws) {
+      try { ws.close(); } catch {}
+      ws = null;
+    }
+  }
+
+  function scheduleReconnect() {
+    if (reconnectTimer) return;
+    reconnectTimer = setTimeout(() => {
+      reconnectTimer = null;
+      connectWS();
+    }, 1500);
+  }
+
+  function connectWS() {
+    cleanupWS();
+
+    // Jeśli WS nie otworzy się szybko, przełącz się na REST
+    wsHandshakeTimer = setTimeout(() => {
+      if (!wsOpen) {
+        cleanupWS();
+        startREST();
+      }
+    }, 1800);
+
+    try {
+      ws = new WebSocket(WS_URL);
+    } catch (e) {
+      startREST();
+      return;
+    }
+
+    ws.addEventListener("open", () => {
+      wsOpen = true;
+      stopREST(); // WS działa -> wyłącz REST
+    });
 
     ws.addEventListener("message", (ev) => {
       let msg;
@@ -226,11 +305,25 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     ws.addEventListener("close", () => {
-      if (hb) clearInterval(hb);
-      hb = null;
-      setTimeout(connect, 1500);
+      cleanupWS();
+      startREST();       // niech działa nawet gdy WS padnie
+      scheduleReconnect();
+    });
+
+    ws.addEventListener("error", () => {
+      // często zaraz potem jest close; i tak przełączamy na REST
+      startREST();
     });
   }
 
-  connect();
+  // Start WS (z fallback)
+  connectWS();
+
+  // Gdy user wróci na kartę i jesteśmy na REST -> natychmiastowy refresh
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden && restActive) restUpdate();
+  });
+  window.addEventListener("focus", () => {
+    if (restActive) restUpdate();
+  });
 });

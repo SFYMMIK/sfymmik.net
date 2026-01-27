@@ -433,31 +433,3 @@ width: auto;
 .rpc-name {
   transition: all .25s ease;
 }
-
-.sp-bar-wrap {
-  margin-top: 10px;
-}
-
-.sp-times{
-  display: flex;
-  justify-content: space-between;
-  font-size: 13px;
-  opacity: .75;
-  margin-bottom: 6px;
-}
-
-.sp-bar{
-  height: 10px;
-  border-radius: 999px;
-  background: rgba(255,255,255,.10);
-  border: 1px solid rgba(255,255,255,.10);
-  overflow: hidden;
-}
-
-.sp-bar-fill{
-  height: 100%;
-  width: 0%;
-  border-radius: 999px;
-  background: rgba(30, 215, 96, .85);
-  transition: width .25s linear;
-}

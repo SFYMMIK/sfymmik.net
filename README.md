@@ -1,7 +1,7 @@
 # This repository is a SOURCE CODE of my website, while sometimes it will be the same as my existing site sometimes it might not be.
 
-# Main URL (Bluehost)
-- https://sfymmik.net
+# Main URL (Cloudflare)
+- https://sfymmik.xyz/
 
 # Backup URL's
 
@@ -11,5 +11,12 @@
 ## GitHub
 - https://sfymmik.github.io/sfymmik.net
 
+# Outdated/near expiration URL's (these URL's might or might not work)
+
 ## Bluehost
-- https://qiq.iks.mybluehost.me/
+- https://sfymmik.net/
+
+## License
+
+Copyright © 2026 Szymon Grajner  
+Licensed under the Apache License, Version 2.0

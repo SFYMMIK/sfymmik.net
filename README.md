@@ -9,7 +9,7 @@
 - https://sfymmik-net.pages.dev/
 
 ## GitHub
-- https://sfymmik.github.io/sfymmik.net
+- https://sfymmik.github.io/sfymmik.xyz
 
 # Outdated/near expiration URL's (these URL's might or might not work)
 

@@ -427,6 +427,39 @@ width: auto;
   margin: 20px 0;
 }
 
+.sp-actions{
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.sp-copy-btn{
+  font-family: IBMBIOS2y;
+  font-size: 15px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  color: #eaeaf0;
+  background: rgba(120, 0, 255, 0.18);
+  border: 1px solid rgba(255,255,255,.12);
+  cursor: pointer;
+}
+
+.sp-copy-btn:disabled{
+  opacity: .55;
+  cursor: not-allowed;
+}
+
+.sp-copy-btn:hover:not(:disabled){
+  box-shadow: 0 0 0 1px rgba(255,255,255,.12), 0 0 22px rgba(120, 0, 255, 0.22);
+}
+
+.sp-copy-status{
+  font-size: 14px;
+  opacity: .8;
+}
+
 .rpc-dot,
 .rpc-value,
 .rpc-sub,

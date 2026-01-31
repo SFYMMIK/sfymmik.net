@@ -17,11 +17,15 @@ document.addEventListener("DOMContentLoaded", () => {
   const spTrack = document.getElementById("spTrack");
   const spArtist = document.getElementById("spArtist");
 
+  const copySpotifyBtn = document.getElementById("copySpotifyBtn");
+  const copySpotifyStatus = document.getElementById("copySpotifyStatus");
+
   // ---- sprawdzenie poprawności (pasek usunięty)
   const required = {
     dot, statusText, avatar, nameEl,
     gameIcon, gameEl, detailsEl,
-    spCover, spTrack, spArtist
+    spCover, spTrack, spArtist,
+    copySpotifyBtn, copySpotifyStatus
   };
   for (const [k, v] of Object.entries(required)) {
     if (!v) {
@@ -37,6 +41,49 @@ document.addEventListener("DOMContentLoaded", () => {
     dnd: "#ed4245",
     offline: "#747f8d"
   };
+
+  // ---- kopiowanie linku Spotify
+  let currentSpotifyUrl = null;
+
+  function spotifyTrackUrl(trackId) {
+    return trackId ? `https://open.spotify.com/track/${trackId}` : null;
+  }
+
+  async function copyText(text) {
+    // Działa na HTTPS/localhost w większości przeglądarek
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+      return;
+    }
+
+    // Fallback
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    ta.setAttribute("readonly", "");
+    ta.style.position = "fixed";
+    ta.style.top = "-9999px";
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand("copy");
+    document.body.removeChild(ta);
+  }
+
+  function setCopyUi({ enabled, status }) {
+    copySpotifyBtn.disabled = !enabled;
+    copySpotifyStatus.textContent = status || "";
+  }
+
+  copySpotifyBtn.addEventListener("click", async () => {
+    if (!currentSpotifyUrl) return;
+    try {
+      await copyText(currentSpotifyUrl);
+      setCopyUi({ enabled: true, status: "Skopiowano ✅" });
+      setTimeout(() => setCopyUi({ enabled: true, status: "" }), 1200);
+    } catch (e) {
+      console.error("[Lanyard widget] kopiowanie nie powiodło się:", e);
+      setCopyUi({ enabled: true, status: "Błąd kopiowania ❌" });
+    }
+  });
 
   function statusLabel(s) {
     return s === "online" ? "Online"
@@ -97,6 +144,9 @@ document.addEventListener("DOMContentLoaded", () => {
         spTrack.textContent = data.spotify.song || "—";
         spArtist.textContent = data.spotify.artist || "—";
 
+        currentSpotifyUrl = spotifyTrackUrl(data.spotify.track_id);
+        setCopyUi({ enabled: !!currentSpotifyUrl, status: "" });
+
         if (data.spotify.album_art_url) {
           spCover.src = data.spotify.album_art_url;
           spCover.hidden = false;
@@ -107,6 +157,9 @@ document.addEventListener("DOMContentLoaded", () => {
         spTrack.textContent = "Nie słucham żadnej muzyki w tej chwili";
         spArtist.textContent = "—";
         spCover.hidden = true;
+
+        currentSpotifyUrl = null;
+        setCopyUi({ enabled: false, status: "Nie słucham" });
       }
 
       // Gra + Szczegóły + Ikona
@@ -136,6 +189,9 @@ document.addEventListener("DOMContentLoaded", () => {
       spTrack.textContent = "Nie słucham żadnej muzyki w tej chwili";
       spArtist.textContent = "—";
       spCover.hidden = true;
+
+      currentSpotifyUrl = null;
+      setCopyUi({ enabled: false, status: "Error" });
     }
   }
 

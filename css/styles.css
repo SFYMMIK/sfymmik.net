@@ -33,14 +33,13 @@ html,
 body {
   font-family: "IBMBIOS2y", monospace;
   color: #0ff;
-  background: linear-gradient(180deg, #000010 0%, #0a001a 67%, #1a002b 100%);
+  background: linear-gradient(180deg, #010113 0%, #14042d 67%, #28063e 100%);
   background-attachment: fixed;
   position: relative;
   height: 100%;
   margin: 0;
   min-height: 100vh;
   letter-spacing: 0;
-  font-smooth: never;
   -webkit-font-smoothing: none;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeSpeed;
@@ -103,24 +102,24 @@ h1, h2, h3, h4, h5, h6 {
 
 /* ===== Fieldset Gradient Borders ===== */
 #fieldset-ppl {
-border: 2px solid transparent;
-border-radius: 10px;
-background:
-linear-gradient(#0b0416, #0b0416) padding-box,
-linear-gradient(to right, #ff0080, #7928ca) border-box;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  background:
+  linear-gradient(#0b0416, #0b0416) padding-box,
+  linear-gradient(to right, #ff0080, #7928ca) border-box;
 }
 
 #fieldset-ppl > legend {
-padding: 0 .6rem;
-background: #0b0416;
-border-radius: 10px;
+  padding: 0 .6rem;
+  background: #0b0416;
+  border-radius: 10px;
 }
 
 #fieldset-ppl-pos {
-align-items: center;
-text-align: center;
-display: flex;
-justify-content: center;
+  align-items: center;
+  text-align: center;
+  display: flex;
+  justify-content: center;
 }
 
 h2, li {
@@ -219,6 +218,8 @@ width: auto;
   color: #888;
   margin: 0;
   -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeSpeed;
 }
 
 /* ===== Upper Buttons ===== */

@@ -1,4 +1,3 @@
- 
       /*   i know you have come here for the code,
            and well sure take it but, take it according
            to my license's permissions, this whole website is made from scratch
@@ -465,4 +464,12 @@ width: auto;
 .rpc-sub,
 .rpc-name {
   transition: all .25s ease;
+}
+
+/* spacers to replace the <br/>'s in my html. */
+.spacer {
+  height: 16px;
+}
+.spacer-lg {
+  height: 32px;
 }
